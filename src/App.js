@@ -1,23 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
+import './App.less';
+import MapView from './components/MapView';
+import ContrlView from './components/ContrlView';
+import View3 from './components/View3';
+import View4 from './components/View4';
+import View5 from './components/View5';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <ContrlView></ContrlView>
+        <MapView></MapView>
+        <View3></View3>
+        <View4></View4>
+        <View5></View5>
     </div>
   );
 }

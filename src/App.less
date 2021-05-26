@@ -1,0 +1,36 @@
+@import '~antd/dist/antd.css';
+
+.App {
+  display: grid;
+  grid-template-columns: 25% 55% 20%;
+  grid-template-rows: 60% 40%;
+  grid-template-areas: "view-contrl view-map view-name3"
+                       "view-name4  view-name5";
+  height: 100%;
+  background: rgb(134, 81, 81);
+  padding: 5px;
+}
+
+.view-map {
+  grid-area: view-map;
+}
+
+.view-contrl {
+  grid-area: view-contrl;
+}
+
+.view-name3 {
+  grid-area: view-name3;
+}
+
+.view-name4 {
+  grid-area: view-name4;
+}
+
+.view-name5 {
+  grid-area: view-name5;
+}
+
+.view {
+  background-color: bisque;
+}
