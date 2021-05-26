@@ -5,9 +5,9 @@
   grid-template-columns: 25% 55% 20%;
   grid-template-rows: 60% 40%;
   grid-template-areas: "view-contrl view-map view-name3"
-                       "view-name4  view-name5";
+                       "view-name4  view-name5 view-name5";
   height: 100%;
-  background: rgb(134, 81, 81);
+  background: #fff;
   padding: 5px;
 }
 
@@ -32,5 +32,29 @@
 }
 
 .view {
-  background-color: bisque;
+  background-color: #FCFCFC;
+}
+
+
+.App .ant-card {
+  margin: 2px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .2);
+}
+
+.App .ant-card-head {
+  min-height: 24px;
+  padding: 0 6px;
+}
+
+.App .ant-card-head .ant-card-head-wrapper .ant-card-head-title {
+  padding: 4px 0;
+}
+
+.App .ant-card-head .ant-card-head-wrapper .ant-card-extra {
+  padding: 4px 0;
+}
+
+.App .ant-card-body {
+  height: calc(100% - 35px);
+  padding: 4px;
 }
