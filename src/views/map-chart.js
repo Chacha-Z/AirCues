@@ -5,7 +5,6 @@ const Chart = (function(){
     var heatmap = null;
     return {
         init: (container, heatData) => {
-            console.log('init')
             var disCountry = new AMap.DistrictLayer.Country({
                 SOC:'CHN',
                 zIndex:10,
@@ -53,7 +52,6 @@ const Chart = (function(){
         },
 
         update: (heatData) => {
-            console.log('update')
             heatmap.setDataSet({
                 data: heatData,
                 max: 80

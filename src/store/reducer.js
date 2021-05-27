@@ -1,5 +1,5 @@
 import defaultState from './state';
-import { TEST_ACTION1, NEXT_SNAP, SAVE_SNAP } from './actions';
+import { TEST_ACTION1, NEXT_SNAP, SAVE_SNAP, CHOOSE_SNAP } from './actions';
 
 const reduers = (state = defaultState, action) => {
     switch(action.type){
@@ -19,6 +19,12 @@ const reduers = (state = defaultState, action) => {
             return {
                 ...state,
                 snapSrc: [...state.snapSrc, action.src]
+            }
+        }
+        case CHOOSE_SNAP: {
+            return {
+                ...state,
+                snapIndex: action.index
             }
         }
         default:
