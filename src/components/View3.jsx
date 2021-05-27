@@ -3,7 +3,7 @@ import { testAction1 } from '../store/actions';
 import { connect } from 'react-redux';
 import { Card } from 'antd';
 
-class View extends React.PureComponent {
+class Test extends React.PureComponent {
 
     render(){
         const { value, onButtonClick } = this.props;
@@ -28,4 +28,4 @@ const mapDispatchToProps = (dispath) => ({
         dispath(testAction1('testdispatchdata'));
     },
 })
-export default connect(mapStateToProps, mapDispatchToProps)(View);
+export default connect(mapStateToProps, mapDispatchToProps)(Test);

@@ -2,12 +2,12 @@
 
 .App {
   display: grid;
-  grid-template-columns: 25% 55% 20%;
+  grid-template-columns: 20% 40% 10%;
   grid-template-rows: 60% 40%;
-  grid-template-areas: "view-contrl view-map view-name3"
-                       "view-name4  view-name5 view-name5";
+  grid-template-areas: "view-contrl view-map view-snapsho0t  view-name3"
+                       "view-name4  view-name5 view-name5 view-name5";
   height: 100%;
-  background: #fff;
+  background: #ddd;
   padding: 5px;
 }
 
@@ -19,8 +19,8 @@
   grid-area: view-contrl;
 }
 
-.view-name3 {
-  grid-area: view-name3;
+.view-snapShot {
+  grid-area: view-snapshot;
 }
 
 .view-name4 {
@@ -38,7 +38,16 @@
 
 .App .ant-card {
   margin: 2px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .2);
+}
+
+.App .ant-card.view-map{
+  margin-right: 0px;
+  border-right: 0;
+}
+
+.App .ant-card.view-snapshoot{
+  margin-left: 0px;
+  border-left: 0;
 }
 
 .App .ant-card-head {
