@@ -19,13 +19,12 @@ class View extends React.PureComponent {
                     x: window.pageXOffset, //页面在水平方向的滚动距离
                     y: window.pageYOffset,//页面在垂直方向的滚动距离
                     backgroundColor: null//无背景
-                    //可以带上宽高截取你所需要的部分内容
                 }).then((canvas) => {
                     this.download(canvas, 'png')
                 });
             }
             this.props.nextSnap();
-        }, 5000)
+        }, 2000)
     }
 
     componentDidUpdate(prevProps, prevState){
@@ -40,7 +39,7 @@ class View extends React.PureComponent {
     }
     render(){
         return (
-            <Card className='view view-map' title="view-map">
+            <Card className='view view-map'>
                 <div className='view-container' ref={ref => this.container = ref}>
                     
                 </div>
@@ -58,7 +57,6 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispath) => ({
     nextSnap: () => {
         dispath(nextSnap())
-
     },
     saveSnap: (src) => {
         dispath(saveSnap(src))
