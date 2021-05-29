@@ -2,25 +2,34 @@
 
 .App {
   display: grid;
-  grid-template-columns: 20% 40% 10%;
-  grid-template-rows: 60% 40%;
-  grid-template-areas: "view-contrl view-map view-snapsho0t  view-name3"
-                       "view-name4  view-name5 view-name5 view-name5";
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 80% 20%;
+  grid-template-areas: "view-main view-main"
+                       "view-name4  view-name5";
   height: 100%;
   background: #ddd;
   padding: 5px;
+}
+
+.view-main {
+  grid-area: view-main;
+  display: grid;
+  grid-template-columns: 40% 10%;
+  grid-template-rows: 10% 90%;
+  grid-template-areas: "view-timeline view-timeline"
+                       "view-map view-snapshoot";
 }
 
 .view-map {
   grid-area: view-map;
 }
 
-.view-contrl {
-  grid-area: view-contrl;
+.view-timeline {
+  grid-area: view-timeline;
 }
 
-.view-snapShot {
-  grid-area: view-snapshot;
+.view-snapshoot {
+  grid-area: view-snapshoot;
 }
 
 .view-name4 {
@@ -40,16 +49,6 @@
   margin: 2px;
 }
 
-.App .ant-card.view-map{
-  margin-right: 0px;
-  border-right: 0;
-}
-
-.App .ant-card.view-snapshoot{
-  margin-left: 0px;
-  border-left: 0;
-}
-
 .App .ant-card-head {
   min-height: 24px;
   padding: 0 6px;
@@ -65,5 +64,10 @@
 
 .App .ant-card-body {
   height: calc(100% - 35px);
+  padding: 4px;
+}
+
+.App .view-main .ant-card-body {
+  height: 100%;
   padding: 4px;
 }

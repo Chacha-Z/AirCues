@@ -20,7 +20,7 @@ const Chart = (function(){
 
             map = new AMap.Map(container, {
                 zooms: [0, 7],
-                zoom: 3.50,
+                zoom: 4,
                 center: [102.618687,37.790976],
                 // showLabel: true,
                 mapStyle: 'amap://styles/dark',

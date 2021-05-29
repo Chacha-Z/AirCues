@@ -16,7 +16,7 @@ class View extends React.PureComponent {
                 onClick={(e)=>this.props.choosSnap(e, index)}></img>
         );
         return (
-            <Card className='view view-snapshoot' title="snapshoot">
+            <Card className='view view-snapshoot'>
                 <div className='view-container' id='snapshoot-container'>
                     {imgsItems}
                 </div>
