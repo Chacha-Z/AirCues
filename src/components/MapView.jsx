@@ -16,9 +16,9 @@ class View extends React.PureComponent {
                 html2canvas(document.getElementsByClassName('heatmap-canvas')[0], {
                     foreignObjectRendering: true,
                     useCORS: true,
-                    x: window.pageXOffset, //页面在水平方向的滚动距离
-                    y: window.pageYOffset,//页面在垂直方向的滚动距离
-                    backgroundColor: null//无背景
+                    x: window.pageXOffset,  //页面在水平方向的滚动距离
+                    y: window.pageYOffset,  //页面在垂直方向的滚动距离
+                    backgroundColor: null   //无背景
                 }).then((canvas) => {
                     this.download(canvas, 'png')
                 });
