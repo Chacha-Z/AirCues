@@ -27,16 +27,14 @@ class Chart{
         data.forEach(element => {
             element.date = this.parseDate(element.date);
         });
-        snaps.forEach(element => {
-            element.start = this.parseDate(element.start);
-            element.end = this.parseDate(element.end);
+        snaps = snaps.map(element => {
+            return this.parseDate(element);
         });
-
         this.config.width = container.clientWidth;
         this.config.height = container.clientHeight;
 
         this.brush
-            .extent([[this.margin.left, 0], [this.config.width - this.margin.right, this.config.height]])
+            .extent([[this.margin.left, 0], [this.config.width - this.margin.right, this.config.height-this.margin.bottom]])
             .on('end', ()=>{
                 console.log('brush end')
             })
@@ -78,9 +76,9 @@ class Chart{
                 .attr('d', this.symbol)
                 .attr('class', 'snaptick')
                 .attr("transform", d => {
-                  return `translate(${this.x(d.start)}, ${this.config.height - this.margin.bottom + this.symbolSize/10})`;
+                  return `translate(${this.x(d)}, ${this.config.height - this.margin.bottom + this.symbolSize/10})`;
                 })
-                .attr('fill','none')
+                .attr('fill', (d, i) => i==0?'black': 'none')
                 .attr('opacity',0.4)
                 .attr('stroke', 'black')
                 .attr('stroke-width', 2)
@@ -89,8 +87,10 @@ class Chart{
                 .call(this.brush);
     }
 
-    update(){
-        
+    update(index){
+        console.log(index, d3.selectAll('path.snaptick'))
+        d3.selectAll('path.snaptick')
+            .attr('fill', (d, i) => i == index?'black': 'none')
     }
 }
 
