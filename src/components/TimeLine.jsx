@@ -78,6 +78,7 @@ class View extends React.PureComponent {
                     <Switch
                         checkedChildren="ON" 
                         unCheckedChildren="OFF" defaultChecked 
+                        size="small"
                         onChange={checked => this.animSwitchChange(checked)}
                     />
                 </div>
