@@ -1,18 +1,18 @@
 import React from 'react';
 import { nextSnap, saveSnap } from '../store/actions';
 import { connect } from 'react-redux';
-import { Card } from 'antd';
+import { Card, Switch } from 'antd';
 import Chart from '../views/map-chart';
 import * as html2canvas from 'html2canvas'
 
 import './view-comp-style.less';
 
 class View extends React.PureComponent {
-    componentDidMount(){
+    componentDidMount() {
         Chart.init(this.container, this.props.heatMapData[this.props.snapIndex]);
 
-        setInterval(()=>{
-            if(this.props.snapSrc.length < this.props.heatMapData.length){
+        setInterval(() => {
+            if (this.props.snapSrc.length < this.props.heatMapData.length) {
                 html2canvas(document.getElementsByClassName('heatmap-canvas')[0], {
                     foreignObjectRendering: true,
                     useCORS: true,
@@ -27,7 +27,7 @@ class View extends React.PureComponent {
         }, 2000)
     }
 
-    componentDidUpdate(prevProps, prevState){
+    componentDidUpdate(prevProps, prevState) {
         Chart.update(this.props.heatMapData[this.props.snapIndex])
     }
 
@@ -37,11 +37,24 @@ class View extends React.PureComponent {
         var imgdata = canvas.toDataURL(type);
         this.props.saveSnap(imgdata);
     }
-    render(){
+
+    hexagonSwitchChange(checked) {
+        Chart.hexagonSwitchChange(checked);  //写在map-chart.js里面
+    }
+
+    render() {
         return (
-            <Card className='view view-map'>
+            <Card className='view view-map' title="AQI Map" extra={
+                <div>
+                    <Switch
+                        checkedChildren="Hexagon on"
+                        unCheckedChildren="Hexagon off"
+                        onChange={checked => this.hexagonSwitchChange(checked)}
+                    />
+                </div>
+            }>
                 <div className='view-container' ref={ref => this.container = ref}>
-                    
+
                 </div>
             </Card>
         )
