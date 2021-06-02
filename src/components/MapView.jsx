@@ -1,9 +1,7 @@
 import React from 'react';
-import { nextSnap, saveSnap } from '../store/actions';
 import { connect } from 'react-redux';
 import { Card, Switch } from 'antd';
 import Chart from '../views/map-chart';
-import * as html2canvas from 'html2canvas'
 
 import './view-comp-style.less';
 
@@ -11,20 +9,6 @@ class View extends React.PureComponent {
     componentDidMount() {
         Chart.init(this.container, this.props.heatMapData[this.props.snapIndex]);
 
-        setInterval(() => {
-            if (this.props.snapSrc.length < this.props.heatMapData.length) {
-                html2canvas(document.getElementsByClassName('heatmap-canvas')[0], {
-                    foreignObjectRendering: true,
-                    useCORS: true,
-                    x: window.pageXOffset, //页面在水平方向的滚动距离
-                    y: window.pageYOffset,//页面在垂直方向的滚动距离
-                    backgroundColor: null//无背景
-                }).then((canvas) => {
-                    this.download(canvas, 'png')
-                });
-            }
-            this.props.nextSnap();
-        }, 2000)
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -44,7 +28,7 @@ class View extends React.PureComponent {
 
     render() {
         return (
-            <Card className='view view-map' title="AQI Map" extra={
+            <Card className='view view-map' extra={
                 <div>
                     <Switch
                         checkedChildren="Hexagon on"
@@ -68,11 +52,5 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispath) => ({
-    nextSnap: () => {
-        dispath(nextSnap())
-    },
-    saveSnap: (src) => {
-        dispath(saveSnap(src))
-    },
 })
 export default connect(mapStateToProps, mapDispatchToProps)(View);
