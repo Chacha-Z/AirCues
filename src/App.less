@@ -2,8 +2,8 @@
 
 .App {
   display: grid;
-  grid-template-columns: 50% 50%;
-  grid-template-rows: 80% 20%;
+  grid-template-columns: 60% 40%;
+  grid-template-rows: 85% 15%;
   grid-template-areas: "view-main view-main"
                        "view-name4  view-name5";
   height: 100%;
@@ -15,7 +15,7 @@
   grid-area: view-main;
   display: grid;
   grid-template-columns: 50% 10%;
-  grid-template-rows: 10% 90%;
+  grid-template-rows: 15% 85%;
   grid-template-areas: "view-timeline view-timeline"
                        "view-map view-snapshoot";
 }
@@ -46,28 +46,32 @@
 
 
 .App .ant-card {
-  margin: 2px;
+  margin: 1px;
 }
 
 .App .ant-card-head {
-  min-height: 24px;
+  font-size: 8px;
+  min-height: 16px;
   padding: 0 6px;
 }
 
 .App .ant-card-head .ant-card-head-wrapper .ant-card-head-title {
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .App .ant-card-head .ant-card-head-wrapper .ant-card-extra {
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .App .ant-card-body {
-  height: calc(100% - 35px);
-  padding: 4px;
+  height: calc(100% - 26px);
+  padding: 2px;
 }
 
 .App .view-main .ant-card-body {
   height: 100%;
-  padding: 4px;
+}
+
+.App .view-main .view-timeline .ant-card-body {
+  height: calc(100% - 26px);
 }

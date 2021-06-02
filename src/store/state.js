@@ -1,4 +1,4 @@
-import data from '../views/data/mockData.json'
+import data from '../views/data/clusterOutput.json'
 
 export default {
     test: 'origintest',
