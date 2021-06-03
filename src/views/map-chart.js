@@ -1,10 +1,13 @@
 /* eslint-disable no-undef */
+import * as d3 from 'd3'
 
 const Chart = (function(){
     var map = null;
     var heatmap = null;
     return {
         init: (container, heatData) => {
+            var max = d3.max(heatData, d => d.count);
+
             var disCountry = new AMap.DistrictLayer.Country({
                 SOC:'CHN',
                 zIndex:10,
@@ -31,7 +34,7 @@ const Chart = (function(){
             map.plugin(["AMap.Heatmap"], function () {
                 //初始化heatmap对象
                 heatmap = new AMap.Heatmap(map, {
-                    radius: 7, //给定半径
+                    radius: 5, //给定半径
                     opacity: [0, 0.8],   
                     gradient: {
                         0.1: 'rgba(50,48,118,1)',
@@ -44,15 +47,16 @@ const Chart = (function(){
                 });
                 heatmap.setDataSet({
                     data: heatData,
-                    max: 80
+                    max: max-20
                 });
             });
         },
 
         update: (heatData) => {
+            var max = d3.max(heatData, d => d.count);
             heatmap.setDataSet({
                 data: heatData,
-                max: 80
+                max: max-20
             });
         }
     }
