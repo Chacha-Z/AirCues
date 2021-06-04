@@ -88,7 +88,6 @@ class Chart{
     }
 
     update(index){
-        console.log(index, d3.selectAll('path.snaptick'))
         d3.selectAll('path.snaptick')
             .attr('fill', (d, i) => i == index?'black': 'none')
     }

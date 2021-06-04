@@ -23,6 +23,7 @@
     "case-sensitive-paths-webpack-plugin": "2.3.0",
     "css-loader": "4.3.0",
     "d3": "^6.7.0",
+    "d3-hexbin": "^0.2.2",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
     "eslint": "^7.11.0",

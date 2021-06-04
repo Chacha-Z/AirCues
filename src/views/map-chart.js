@@ -1,41 +1,32 @@
 /* eslint-disable no-undef */
 import * as d3 from 'd3'
 
-const Chart = (function(){
-    var map = null;
+const Chart = (function () {
     var heatmap = null;
+
     return {
-        init: (container, heatData) => {
+        init: (map, heatData) => {
             var max = d3.max(heatData, d => d.count);
 
             var disCountry = new AMap.DistrictLayer.Country({
-                SOC:'CHN',
-                zIndex:10,
-                depth:2,
-                styles:{
-                    'nation-stroke':'#22ffff',
-                    'coastline-stroke':[0.85, 0.63, 0.94, 1],
-                    'province-stroke':'white',
+                SOC: 'CHN',
+                zIndex: 10,
+                depth: 2,
+                styles: {
+                    'nation-stroke': '#22ffff',
+                    'coastline-stroke': [0.85, 0.63, 0.94, 1],
+                    'province-stroke': 'white',
                     'city-stroke': 'rgba(255,255,255,0)',
-                    'fill':'rgba(254,255,255,0.15)'
+                    'fill': 'rgba(254,255,255,0.15)'
                 }
             })
-
-            map = new AMap.Map(container, {
-                zooms: [0, 7],
-                zoom: 4,
-                center: [102.618687,37.790976],
-                // showLabel: true,
-                mapStyle: 'amap://styles/dark',
-                // layers: [disCountry],
-            });
             map.add(disCountry)
-            
+
             map.plugin(["AMap.Heatmap"], function () {
                 //初始化heatmap对象
                 heatmap = new AMap.Heatmap(map, {
-                    radius: 5, //给定半径
-                    opacity: [0, 0.8],   
+                    radius: 7, //给定半径
+                    opacity: [0, 0.8],
                     gradient: {
                         0.1: 'rgba(50,48,118,1)',
                         0.2: 'rgba(127,60,255,1)',
@@ -47,7 +38,7 @@ const Chart = (function(){
                 });
                 heatmap.setDataSet({
                     data: heatData,
-                    max: max-20
+                    max: 100
                 });
             });
         },
@@ -56,8 +47,16 @@ const Chart = (function(){
             var max = d3.max(heatData, d => d.count);
             heatmap.setDataSet({
                 data: heatData,
-                max: max-20
+                max: 100
             });
+        },
+
+        hexagonSwitchChange(checked) {
+            if (checked) {
+                heatmap.hide();
+            } else {
+                heatmap.show();
+            }
         }
     }
 })();

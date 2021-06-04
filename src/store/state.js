@@ -1,9 +1,8 @@
-import data from '../views/data/clusterOutput.json'
-import data2 from '../views/data/aqiOutput.json'
+import data from '../views/data/clusterOutput(1).json'
 export default {
     test: 'origintest',
     snapTime: data.snaps,
-    heatMapData: [data2],
+    heatMapData: data.heatMapData,
     snapIndex: 0,
     snapSrc: []
 }
