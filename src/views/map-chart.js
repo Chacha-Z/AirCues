@@ -1,12 +1,13 @@
 /* eslint-disable no-undef */
+import * as d3 from 'd3'
 
 const Chart = (function () {
-    var map = null;
     var heatmap = null;
-    var hexmap = null;
 
     return {
-        init: (container, heatData) => {
+        init: (map, heatData) => {
+            var max = d3.max(heatData, d => d.count);
+
             var disCountry = new AMap.DistrictLayer.Country({
                 SOC: 'CHN',
                 zIndex: 10,
@@ -19,15 +20,6 @@ const Chart = (function () {
                     'fill': 'rgba(254,255,255,0.15)'
                 }
             })
-
-            map = new AMap.Map(container, {
-                zooms: [0, 7],
-                zoom: 4,
-                center: [102.618687, 37.790976],
-                // showLabel: true,
-                mapStyle: 'amap://styles/dark',
-                // layers: [disCountry],
-            });
             map.add(disCountry)
 
             map.plugin(["AMap.Heatmap"], function () {
@@ -46,15 +38,16 @@ const Chart = (function () {
                 });
                 heatmap.setDataSet({
                     data: heatData,
-                    max: 80
+                    max: 100
                 });
             });
         },
 
         update: (heatData) => {
+            var max = d3.max(heatData, d => d.count);
             heatmap.setDataSet({
                 data: heatData,
-                max: 80
+                max: 100
             });
         },
 
@@ -65,7 +58,6 @@ const Chart = (function () {
                 heatmap.show();
             }
         }
-
     }
 })();
 

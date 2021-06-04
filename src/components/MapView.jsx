@@ -1,43 +1,37 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Switch } from 'antd';
+/* eslint-disable no-undef */
 import Chart from '../views/map-chart';
+import HexChart from '../views/hexbin-chart';
+import * as d3 from 'd3'
 
 import './view-comp-style.less';
 
 class View extends React.PureComponent {
+    map = null;
+
     componentDidMount() {
-        Chart.init(this.container, this.props.heatMapData[this.props.snapIndex]);
-
+        this.map = new AMap.Map(this.container, {
+            zooms: [0, 15],
+            zoom: 4,
+            center: [102.618687, 37.790976],
+            mapStyle: 'amap://styles/dark',
+        });
+        Chart.init(this.map, this.props.heatMapData[this.props.snapIndex]);
+        
+        d3.csv("./CSVdata/hexCSV.csv").then((data)=>{
+            HexChart.init(this.map, this.container, data);
+        })
+    
     }
-
     componentDidUpdate(prevProps, prevState) {
         Chart.update(this.props.heatMapData[this.props.snapIndex])
     }
-
-    //图片下载操作,指定图片类型
-    download(canvas, type) {
-        //设置保存图片的类型
-        var imgdata = canvas.toDataURL(type);
-        this.props.saveSnap(imgdata);
-    }
-
-    hexagonSwitchChange(checked) {
-        Chart.hexagonSwitchChange(checked);  //写在map-chart.js里面
-    }
-
     render() {
         return (
-            <Card className='view view-map' extra={
-                <div>
-                    <Switch
-                        checkedChildren="Hexagon on"
-                        unCheckedChildren="Hexagon off"
-                        onChange={checked => this.hexagonSwitchChange(checked)}
-                    />
-                </div>
-            }>
-                <div className='view-container' ref={ref => this.container = ref}>
+            <Card className='view view-map'>
+                <div className='view-container' ref={ref => this.container = ref} id='map'>
 
                 </div>
             </Card>

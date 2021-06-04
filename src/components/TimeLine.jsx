@@ -3,6 +3,8 @@ import { nextSnap, saveSnap } from '../store/actions';
 import { connect } from 'react-redux';
 import { Card, Switch } from 'antd';
 import Chart from '../views/timeline-chart';
+import MapChart from '../views/map-chart';
+import HexChart from '../views/hexbin-chart';
 import * as html2canvas from 'html2canvas';
 
 class View extends React.PureComponent {
@@ -24,18 +26,7 @@ class View extends React.PureComponent {
         Chart.init(this.container, this.data, this.props.snaps);
         
         this.clickI = setInterval(()=>{
-            if(this.props.snapSrc.length < this.props.heatMapData.length){
-                html2canvas(document.getElementsByClassName('heatmap-canvas')[0], {
-                    foreignObjectRendering: true,
-                    useCORS: true,
-                    x: window.pageXOffset,  //页面在水平方向的滚动距离
-                    y: window.pageYOffset,  //页面在垂直方向的滚动距离
-                    backgroundColor: null   //无背景
-                }).then((canvas) => {
-                    this.download(canvas, 'png')
-                });
-            }
-            this.props.nextSnap();
+            // this.snapsPlay();
         }, 2000)
     }
 
@@ -44,25 +35,28 @@ class View extends React.PureComponent {
     }
 
     animSwitchChange(checked){
-        console.log(checked)
         if(!checked){
             clearInterval(this.clickI)
         }else{
             this.clickI = setInterval(()=>{
-                if(this.props.snapSrc.length < this.props.heatMapData.length){
-                    html2canvas(document.getElementsByClassName('heatmap-canvas')[0], {
-                        foreignObjectRendering: true,
-                        useCORS: true,
-                        x: window.pageXOffset,  //页面在水平方向的滚动距离
-                        y: window.pageYOffset,  //页面在垂直方向的滚动距离
-                        backgroundColor: null   //无背景
-                    }).then((canvas) => {
-                        this.download(canvas, 'png')
-                    });
-                }
-                this.props.nextSnap();
+                this.snapsPlay();
             }, 2000)
         }
+    }
+
+    snapsPlay(){
+        if(this.props.snapSrc.length < this.props.heatMapData.length){
+            html2canvas(document.getElementsByClassName('heatmap-canvas')[0], {
+                foreignObjectRendering: true,
+                useCORS: true,
+                x: window.pageXOffset,  //页面在水平方向的滚动距离
+                y: window.pageYOffset,  //页面在垂直方向的滚动距离
+                backgroundColor: null   //无背景
+            }).then((canvas) => {
+                this.download(canvas, 'png')
+            });
+        }
+        this.props.nextSnap();
     }
 
     //图片下载操作,指定图片类型
@@ -71,11 +65,32 @@ class View extends React.PureComponent {
         var imgdata = canvas.toDataURL(type);
         this.props.saveSnap(imgdata);
     }
+    
+    hexagonSwitchChange(checked) {
+        MapChart.hexagonSwitchChange(checked);  //写在map-chart.js里面
+        HexChart.hexagonSwitchChange(checked);  //写在map-chart.js里面
+
+        if(checked && this.playBut.innerText == 'ON'){
+            const mouseEvent = new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            this.playBut.dispatchEvent(mouseEvent)
+        }
+    }
+
     render(){
         return (
             <Card className='view view-timeline' title="test block" extra={
                 <div>
-                    <Switch
+                    <Switch className='ctrlBut'
+                        checkedChildren="Hexagon on"
+                        unCheckedChildren="Hexagon off"
+                        size="small"
+                        onChange={checked => this.hexagonSwitchChange(checked)}
+                    />
+                    <Switch className='ctrlBut' ref={ ref=> this.playBut = ref }
                         checkedChildren="ON" 
                         unCheckedChildren="OFF" defaultChecked 
                         size="small"
