@@ -8,7 +8,7 @@ class Test extends React.PureComponent {
     render(){
         const { value, onButtonClick } = this.props;
         return (
-            <Card className='view view-name4' title="test block">
+            <Card className='view view-name4' title="test block4">
             <div className='container'>
                 <span>state.test = {value}</span>
                 <button onClick={onButtonClick}>click me </button>

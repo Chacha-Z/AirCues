@@ -26,7 +26,7 @@ class View extends React.PureComponent {
         Chart.init(this.container, this.data, this.props.snaps);
         
         this.clickI = setInterval(()=>{
-            // this.snapsPlay();
+            this.snapsPlay();
         }, 2000)
     }
 
@@ -38,6 +38,14 @@ class View extends React.PureComponent {
         if(!checked){
             clearInterval(this.clickI)
         }else{
+            if(this.hexbinBut.innerText == 'Hexagon on'){
+                const mouseEvent = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                this.hexbinBut.dispatchEvent(mouseEvent)
+            }
             this.clickI = setInterval(()=>{
                 this.snapsPlay();
             }, 2000)
@@ -84,7 +92,7 @@ class View extends React.PureComponent {
         return (
             <Card className='view view-timeline' title="test block" extra={
                 <div>
-                    <Switch className='ctrlBut'
+                    <Switch className='ctrlBut' ref={ ref=> this.hexbinBut = ref }
                         checkedChildren="Hexagon on"
                         unCheckedChildren="Hexagon off"
                         size="small"

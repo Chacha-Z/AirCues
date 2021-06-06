@@ -21,7 +21,7 @@ class View extends React.PureComponent {
         Chart.init(this.map, this.props.heatMapData[this.props.snapIndex]);
         
         d3.csv("./CSVdata/hexCSV.csv").then((data)=>{
-            HexChart.init(this.map, this.container, data);
+            HexChart.init(this.map, this.container, data, this.props.dispatch);
         })
     
     }
@@ -45,6 +45,7 @@ const mapStateToProps = (state) => ({
     snapSrc: state.snapSrc
 })
 
-const mapDispatchToProps = (dispath) => ({
+const mapDispatchToProps = (dispatch) => ({
+    dispatch
 })
 export default connect(mapStateToProps, mapDispatchToProps)(View);
