@@ -4,5 +4,6 @@ export default {
     snapTime: data.snaps,
     heatMapData: data.heatMapData,
     snapIndex: 0,
-    snapSrc: []
+    snapSrc: [],
+    choosedHexbin: []
 }

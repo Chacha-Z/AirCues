@@ -4,8 +4,8 @@
   display: grid;
   grid-template-columns: 60% 40%;
   grid-template-rows: 85% 15%;
-  grid-template-areas: "view-main view-main"
-                       "view-name4  view-name5";
+  grid-template-areas: "view-main  view-compare"
+                       "view-name4  view-compare";
   height: 100%;
   background: #ddd;
   padding: 5px;
@@ -14,7 +14,7 @@
 .view-main {
   grid-area: view-main;
   display: grid;
-  grid-template-columns: 50% 10%;
+  grid-template-columns: 85% 15%;
   grid-template-rows: 15% 85%;
   grid-template-areas: "view-timeline view-timeline"
                        "view-map view-snapshoot";
@@ -32,13 +32,14 @@
   grid-area: view-snapshoot;
 }
 
+.view-compare {
+  grid-area: view-compare;
+}
+
 .view-name4 {
   grid-area: view-name4;
 }
 
-.view-name5 {
-  grid-area: view-name5;
-}
 
 .view {
   background-color: #FCFCFC;

@@ -6,6 +6,7 @@ export const TEST_ACTION1 = 'TEST_ACTION1'
 export const NEXT_SNAP = 'NEXT_SNAP'
 export const SAVE_SNAP = 'SAVE_SNAP'
 export const CHOOSE_SNAP = 'CHOOSE_SNAP'
+export const CHOOSE_HEXBIN = 'CHOOSE_HEXBIN'
 
 export const testAction1 = arg1 => {
     return {
@@ -31,5 +32,12 @@ export const chooseSnap = (index) => {
     return {
         type: CHOOSE_SNAP,
         index
+    }
+}
+
+export const chooseHexbin = (data) => {
+    return {
+        type: CHOOSE_HEXBIN,
+        data
     }
 }

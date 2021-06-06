@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
 import * as d3hexbin from "d3-hexbin";
+import { chooseHexbin } from '../store/actions';
+
 /* eslint-disable no-undef */
 class Chart {
     aqidata = [];
@@ -7,26 +9,25 @@ class Chart {
     width = 0;
     height = 0;
     nowzoom = 0;
-    radius = 1000;
+    radius = 100;
 
     container = null;
     map = null;
     svg = null;
     customLayer = null;
+    geocoder = null;
 
     hexitem = null;
     largehexitem = null;
     smallhexitem = null;
-    large_hex = null;
-    small_hex = null;
     
-    init(map, container, aqidata) {
+    init(map, container, aqidata, dispatch) {
         this.map = map;
         this.aqidata = aqidata;
         this.container = container;
 
         map.on("complete", ()=>{
-            this.svg = this.drawhexbin();
+            this.svg = this.drawhexbin(dispatch);
             // 创建一个自定义图层
             this.customLayer  = new AMap.CustomLayer(this.svg.node(), {
                 zIndex: 100,
@@ -38,14 +39,15 @@ class Chart {
         });
 
         map.on('moveend', ()=>{
-            this.svg = this.drawhexbin();
+            this.svg = this.drawhexbin(dispatch);
             d3.select('#hexsvg').remove();
             console.log(d3.select('.amap-e'))
             d3.select('.amap-e').node().appendChild(this.svg.node());
             console.log('moveend')
-        })
+        });
+        
         map.on('zoomend', ()=>{
-            this.svg = this.drawhexbin();
+            this.svg = this.drawhexbin(dispatch);
             d3.select('#hexsvg').remove();
             console.log(d3.select('.amap-e'))
             d3.select('.amap-e').node().appendChild(this.svg.node());
@@ -54,7 +56,7 @@ class Chart {
     }
 
     // 绘制蜂窝图层
-    drawhexbin = () => {
+    drawhexbin = (dispatch) => {
         this.width = this.container.clientWidth;
         this.height = this.container.clientHeight;
         this.svg = d3 //构建svg画布
@@ -66,14 +68,14 @@ class Chart {
             .attr("transform", "translate(" + 0 + "," + 0 + ")");
 
         this.nowzoom = this.map.getZoom();
-        this.radius = 1000 * 2 ** (this.nowzoom - 10);
+        this.radius = 650 * 2 ** (this.nowzoom - 10);
 
         //生成大小六边形
-        this.large_hex = this.radius_vertex(this.radius);
-        this.small_hex = this.radius_vertex(this.radius * 0.8);
+        let large_hex = this.radius_vertex(this.radius);
+        let small_hex = this.radius_vertex(this.radius * 0.8);
 
         let aqi_bins = this.dataProcess(this.aqidata);
-        // console.log("aqi_bins:  ", aqi_bins);
+        console.log("aqi_bins:  ", aqi_bins);
 
         //颜色映射
         let red_color = d3
@@ -92,118 +94,144 @@ class Chart {
             .enter();
 
         // 外层六边形
-        this.largehexitem = this.hexitem
+        let largehexitem = this.hexitem
             .append("path")
-            .attr("d", this.vertex_path(this.large_hex))
+            .attr("d", this.vertex_path(large_hex))
             .attr("transform", (d) => `translate(${d.x},${d.y})`)
             .attr("fill", function (d) {
                 return blue_color(d.aqi_avg);
             })
             .attr("opacity", 0.85);
-
+        let smallhexitem = null;
         // 内部六边形
-        if (this.nowzoom <= 5) {
-            //缩放Level 1 （整个六边形）
-            this.smallhexitem = this.hexitem
+        if (this.nowzoom <= 4) {
+            smallhexitem = this.hexbinlevel1(red_color, small_hex, this.hexitem);
+        } else if (this.nowzoom <= 5) {
+            smallhexitem = this.hexbinlevel2(red_color, small_hex, this.hexitem);
+        } else {
+            smallhexitem = this.hexbinlevel3(aqi_bins, this.hexitem);
+        }
+        largehexitem
+            .style('cursor', 'pointer')
+            .on('click', (e)=>{
+                // 根据坐标获取中心点经纬度
+                var pixel = new AMap.Pixel(e.target.__data__.x, e.target.__data__.y);
+                var lnglat = this.map.containerToLngLat(pixel);
+
+                console.log(e.target.__data__)
+
+                // 保存当前点击六边形原始数据，用于对比视图
+                dispatch(chooseHexbin(e.target.__data__))
+
+
+            })
+        return this.svg;
+    }
+
+    hexbinlevel1(red_color, small_hex, hexitem){
+        //缩放Level 1 （整个六边形）
+        let smallhexitem = hexitem
+            .append("path")
+            .attr("d", this.vertex_path(small_hex))
+            .attr(
+                "transform",
+                (d) =>
+                    `translate(${d.x + this.wind_move(d.avg_U, d.avg_V)[0]},${d.y + this.wind_move(d.avg_U, d.avg_V)[1]
+                    })`
+            )
+            .attr("fill", function (d) {
+                return red_color(d.aqi_avg);
+            })
+            .attr("opacity", 0.9);
+        return smallhexitem;
+    }
+    hexbinlevel2(red_color, small_hex, hexitem){//缩放Level 2 （六块三角形）
+        let vertex = small_hex;
+        let smallhexitem = null;
+        for (let i = 0; i < vertex.length; i++) {
+            //length是6
+            let j = (i + 1) % vertex.length;
+            let tripath =
+                "M0,0L" +
+                vertex[i][0] +
+                "," +
+                vertex[i][1] +
+                "L" +
+                vertex[j][0] +
+                "," +
+                vertex[j][1] +
+                "Z";
+            smallhexitem = hexitem
                 .append("path")
-                .attr("d", this.vertex_path(this.small_hex))
+                .attr("d", tripath)
                 .attr(
                     "transform",
                     (d) =>
                         `translate(${d.x + this.wind_move(d.avg_U, d.avg_V)[0]},${d.y + this.wind_move(d.avg_U, d.avg_V)[1]
                         })`
-                )
+                ) //从原点移过来
                 .attr("fill", function (d) {
-                    return red_color(d.aqi_avg);
+                    return red_color(d.aqi_sum[i]); // 需要一个六个的数组， 画小三角的颜色
                 })
-                .attr("opacity", 0.9);
-        } else if (this.nowzoom <= 7) {
-            //缩放Level 2 （六块三角形）
-            let vertex = this.small_hex;
-            for (let i = 0; i < vertex.length; i++) {
-                //length是6
-                let j = (i + 1) % vertex.length;
+                .attr("opacity", 0.85);
+        }
+        return smallhexitem;
+    }
+    hexbinlevel3(aqi_bins, hexitem){
+        //缩放Level 3 三角区分层
+        let itemcolor = [
+            "MediumPurple",
+            "PaleVioletRed",
+            "OliveDrab",
+            "Coral",
+            "DodgerBlue",
+            "Gold",
+        ];
+
+        let aqi_color = []; //存放6个颜色比例尺
+        itemcolor.forEach((e, i) => {
+            aqi_color.push(
+                d3
+                    .scaleSequential(d3.interpolate("white", e))
+                    .domain([0, d3.max(aqi_bins, (d) => d.aqi_sum[i])])
+            );
+        });
+
+        // 生成层次hex 的定点
+        let aqi_vertex = [];
+        let s = 0;
+        for (let i = 1; i <= 7; i++) {
+            // s += (6-i)**2;
+            aqi_vertex.push(this.radius_vertex(this.radius * 0.8 * (i / 6) ** 0.5));
+        }
+        // console.log("aqi_vertex:", aqi_vertex);
+        let smallhexitem;
+        for (let i = 5; i >= 0; i--) {
+            // 六瓣三角形
+            for (let j = 0; j < 6; j++) {
+                // 七层
+                let k = (j + 1) % 6; // k不就是i+1吗？ 6的时候不是
                 let tripath =
                     "M0,0L" +
-                    vertex[i][0] +
+                    aqi_vertex[i][j][0] +
                     "," +
-                    vertex[i][1] +
+                    aqi_vertex[i][j][1] +
                     "L" +
-                    vertex[j][0] +
+                    aqi_vertex[i][k][0] +
                     "," +
-                    vertex[j][1] +
+                    aqi_vertex[i][k][1] +
                     "Z";
-                this.hexitem
+                smallhexitem = hexitem
                     .append("path")
                     .attr("d", tripath)
-                    .attr(
-                        "transform",
-                        (d) =>
-                            `translate(${d.x + this.wind_move(d.avg_U, d.avg_V)[0]},${d.y + this.wind_move(d.avg_U, d.avg_V)[1]
-                            })`
-                    ) //从原点移过来
+                    .attr("transform", (d) => `translate(${d.x},${d.y})`)
                     .attr("fill", function (d) {
-                        return red_color(d.aqi_sum[i]); // 需要一个六个的数组， 画小三角的颜色
-                    })
-                    .attr("opacity", 0.85);
-            }
-        } else {
-            //缩放Level 3 三角区分层
-            let itemcolor = [
-                "MediumPurple",
-                "PaleVioletRed",
-                "OliveDrab",
-                "Coral",
-                "DodgerBlue",
-                "Gold",
-            ];
-
-            let aqi_color = []; //存放6个颜色比例尺
-            itemcolor.forEach((e, i) => {
-                aqi_color.push(
-                    d3
-                        .scaleSequential(d3.interpolate("white", e))
-                        .domain([0, d3.max(aqi_bins, (d) => d.aqi_sum[i])])
-                );
-            });
-
-            // 生成层次hex 的定点
-            let aqi_vertex = [];
-            let s = 0;
-            for (let i = 1; i <= 7; i++) {
-                // s += (6-i)**2;
-                aqi_vertex.push(this.radius_vertex(this.radius * 0.8 * (i / 6) ** 0.5));
-            }
-            // console.log("aqi_vertex:", aqi_vertex);
-
-            for (let i = 5; i >= 0; i--) {
-                // 六瓣三角形
-                for (let j = 0; j < 6; j++) {
-                    // 七层
-                    let k = (j + 1) % 6; // k不就是i+1吗？ 6的时候不是
-                    let tripath =
-                        "M0,0L" +
-                        aqi_vertex[i][j][0] +
-                        "," +
-                        aqi_vertex[i][j][1] +
-                        "L" +
-                        aqi_vertex[i][k][0] +
-                        "," +
-                        aqi_vertex[i][k][1] +
-                        "Z";
-                    this.hexitem
-                        .append("path")
-                        .attr("d", tripath)
-                        .attr("transform", (d) => `translate(${d.x},${d.y})`)
-                        .attr("fill", function (d) {
-                            return aqi_color[j](d.aqi_sum[i]);
-                        });
-                }
+                        return aqi_color[j](d.aqi_sum[i]);
+                    });
             }
         }
-        return this.svg;
+        return smallhexitem;
     }
-    
     data_to_hexbin = (data) => {
         data.forEach((d) => {
             let lnglat = new AMap.LngLat(d.lng, d.lat); //给定的经纬度创建一个地理坐标
@@ -220,7 +248,7 @@ class Chart {
             .extent([this.width, this.height]);
 
         let bins = hexbin(data); //生成数组
-        // console.log('hexbin arr:  ',bins); //待解决问题，生成的像素有负值，应该是地图图层transform右上角！！！！！
+        // console.log('hexbin arr:  ',bins); 
         return bins;
     }
     //生成顶点
