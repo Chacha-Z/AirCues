@@ -1,10 +1,11 @@
 import React from 'react';
 import { nextSnap, saveSnap } from '../store/actions';
 import { connect } from 'react-redux';
-import { Card, Switch } from 'antd';
+import { Card, Switch, Radio } from 'antd';
 import Chart from '../views/timeline-chart';
 import MapChart from '../views/map-chart';
-import HexChart from '../views/hexbin-chart';
+import HexbinChart from '../views/hexbin-chart';
+import ScatterChart from '../views/scatterpoint-chart';
 import * as html2canvas from 'html2canvas';
 
 class View extends React.PureComponent {
@@ -38,14 +39,7 @@ class View extends React.PureComponent {
         if(!checked){
             clearInterval(this.clickI)
         }else{
-            if(this.hexbinBut.innerText == 'Hexagon on'){
-                const mouseEvent = new MouseEvent('click', {
-                    bubbles: true,
-                    cancelable: true,
-                    view: window
-                });
-                this.hexbinBut.dispatchEvent(mouseEvent)
-            }
+
             this.clickI = setInterval(()=>{
                 this.snapsPlay();
             }, 2000)
@@ -74,11 +68,30 @@ class View extends React.PureComponent {
         this.props.saveSnap(imgdata);
     }
     
-    hexagonSwitchChange(checked) {
-        MapChart.hexagonSwitchChange(checked);  //写在map-chart.js里面
-        HexChart.hexagonSwitchChange(checked);  //写在map-chart.js里面
+    onLayerChange(e) {
+        let value = e.target.value
+        let checked = e.target.checked
+        switch (value) {
+            case 'heatmap':
+                MapChart.mapSwitchChange(checked);
+                HexbinChart.hexagonSwitchChange(!checked);  
+                ScatterChart.scatterSwitchChange(!checked);  
+                break;
+            case 'hexbin':
+                HexbinChart.hexagonSwitchChange(checked);  
+                ScatterChart.scatterSwitchChange(!checked);
+                MapChart.mapSwitchChange(!checked);
+                break;
+            case 'scatter':
+                ScatterChart.scatterSwitchChange(checked);  
+                MapChart.mapSwitchChange(!checked); 
+                HexbinChart.hexagonSwitchChange(!checked); 
+                break;
+            default:
+                break;
+        }
 
-        if(checked && this.playBut.innerText == 'ON'){
+        if(value != 'heatmap' && this.playBut.innerText == 'ON'){
             const mouseEvent = new MouseEvent('click', {
                 bubbles: true,
                 cancelable: true,
@@ -92,12 +105,12 @@ class View extends React.PureComponent {
         return (
             <Card className='view view-timeline' title="test block" extra={
                 <div>
-                    <Switch className='ctrlBut' ref={ ref=> this.hexbinBut = ref }
-                        checkedChildren="Hexagon on"
-                        unCheckedChildren="Hexagon off"
-                        size="small"
-                        onChange={checked => this.hexagonSwitchChange(checked)}
-                    />
+                    <span className="func-span">Layer: </span>
+                    <Radio.Group onChange={this.onLayerChange.bind(this)} defaultValue="heatmap" size="small">
+                        <Radio.Button value="heatmap" >Heatmap</Radio.Button>
+                        <Radio.Button value="hexbin" >Hexbin</Radio.Button>
+                        <Radio.Button value="scatter" >Scatter</Radio.Button>
+                    </Radio.Group>
                     <Switch className='ctrlBut' ref={ ref=> this.playBut = ref }
                         checkedChildren="ON" 
                         unCheckedChildren="OFF" defaultChecked 

@@ -51,11 +51,11 @@ const Chart = (function () {
             });
         },
 
-        hexagonSwitchChange(checked) {
+        mapSwitchChange(checked) {
             if (checked) {
-                heatmap.hide();
-            } else {
                 heatmap.show();
+            } else {
+                heatmap.hide();
             }
         }
     }

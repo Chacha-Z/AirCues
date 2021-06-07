@@ -1,15 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Card } from 'antd';
-import Chart from '../views/compare-hexbin';
+import HexChart from '../views/compare-hexbin';
+import BarChart from '../views/compare-bar';
 
 class View extends React.PureComponent {
     componentDidMount(){
-        Chart.init(this.container, this.props.choosedHexbin)
+        HexChart.init(this.container, this.props.choosedHexbin)
+        BarChart.init(this.container)
     }
 
     componentDidUpdate(){
-        Chart.update(this.props.choosedHexbin)
+        HexChart.update(this.props.choosedHexbin)
     }
 
     render(){
