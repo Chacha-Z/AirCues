@@ -41,17 +41,17 @@ class Chart {
         map.on('moveend', ()=>{
             this.svg = this.drawhexbin(dispatch);
             d3.select('#hexsvg').remove();
-            console.log(d3.select('.amap-e'))
-            d3.select('.amap-e').node().appendChild(this.svg.node());
-            console.log('moveend')
+            if(d3.select('.amap-e').node() != null){
+                d3.select('.amap-e').node().appendChild(this.svg.node());
+            }
         });
         
         map.on('zoomend', ()=>{
             this.svg = this.drawhexbin(dispatch);
             d3.select('#hexsvg').remove();
-            console.log(d3.select('.amap-e'))
-            d3.select('.amap-e').node().appendChild(this.svg.node());
-            console.log('zoomend')
+            if(d3.select('.amap-e').node() != null){
+                d3.select('.amap-e').node().appendChild(this.svg.node());
+            }
         })
     }
 
@@ -75,7 +75,6 @@ class Chart {
         let small_hex = this.radius_vertex(this.radius * 0.8);
 
         let aqi_bins = this.dataProcess(this.aqidata);
-        console.log("aqi_bins:  ", aqi_bins);
 
         //颜色映射
         let red_color = d3
@@ -102,35 +101,43 @@ class Chart {
                 return blue_color(d.aqi_avg);
             })
             .attr("opacity", 0.85);
-        let smallhexitem = null;
         // 内部六边形
         if (this.nowzoom <= 4) {
-            smallhexitem = this.hexbinlevel1(red_color, small_hex, this.hexitem);
+            this.hexbinlevel1(red_color, small_hex, this.hexitem);
         } else if (this.nowzoom <= 5) {
-            smallhexitem = this.hexbinlevel2(red_color, small_hex, this.hexitem);
+            this.hexbinlevel2(red_color, small_hex, this.hexitem);
         } else {
-            smallhexitem = this.hexbinlevel3(aqi_bins, this.hexitem);
+            this.hexbinlevel3(aqi_bins, this.hexitem);
         }
-        largehexitem
+        // 透明图层，for交互
+        let chipath = this.hexitem
+            .append("path")
+            .attr("d", this.vertex_path(large_hex))
+            .attr("transform", (d) => `translate(${d.x},${d.y})`)
+            .attr("fill", 'blue')
+            .attr("opacity", 0);
+
+        chipath
             .style('cursor', 'pointer')
             .on('click', (e)=>{
+
                 // 根据坐标获取中心点经纬度
                 var pixel = new AMap.Pixel(e.target.__data__.x, e.target.__data__.y);
                 var lnglat = this.map.containerToLngLat(pixel);
 
-                console.log(e.target.__data__)
+                d3.select(e.target)
+                    .attr("opacity", 0.5)
+                    .classed('hexbin-clicked', true)
 
                 // 保存当前点击六边形原始数据，用于对比视图
                 dispatch(chooseHexbin(e.target.__data__))
-
-
             })
         return this.svg;
     }
 
     hexbinlevel1(red_color, small_hex, hexitem){
         //缩放Level 1 （整个六边形）
-        let smallhexitem = hexitem
+        hexitem
             .append("path")
             .attr("d", this.vertex_path(small_hex))
             .attr(
@@ -143,11 +150,9 @@ class Chart {
                 return red_color(d.aqi_avg);
             })
             .attr("opacity", 0.9);
-        return smallhexitem;
     }
     hexbinlevel2(red_color, small_hex, hexitem){//缩放Level 2 （六块三角形）
         let vertex = small_hex;
-        let smallhexitem = null;
         for (let i = 0; i < vertex.length; i++) {
             //length是6
             let j = (i + 1) % vertex.length;
@@ -161,7 +166,7 @@ class Chart {
                 "," +
                 vertex[j][1] +
                 "Z";
-            smallhexitem = hexitem
+            hexitem
                 .append("path")
                 .attr("d", tripath)
                 .attr(
@@ -175,7 +180,6 @@ class Chart {
                 })
                 .attr("opacity", 0.85);
         }
-        return smallhexitem;
     }
     hexbinlevel3(aqi_bins, hexitem){
         //缩放Level 3 三角区分层
@@ -205,7 +209,6 @@ class Chart {
             aqi_vertex.push(this.radius_vertex(this.radius * 0.8 * (i / 6) ** 0.5));
         }
         // console.log("aqi_vertex:", aqi_vertex);
-        let smallhexitem;
         for (let i = 5; i >= 0; i--) {
             // 六瓣三角形
             for (let j = 0; j < 6; j++) {
@@ -221,7 +224,7 @@ class Chart {
                     "," +
                     aqi_vertex[i][k][1] +
                     "Z";
-                smallhexitem = hexitem
+                hexitem
                     .append("path")
                     .attr("d", tripath)
                     .attr("transform", (d) => `translate(${d.x},${d.y})`)
@@ -230,7 +233,6 @@ class Chart {
                     });
             }
         }
-        return smallhexitem;
     }
     data_to_hexbin = (data) => {
         data.forEach((d) => {

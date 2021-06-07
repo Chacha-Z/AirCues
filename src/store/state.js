@@ -1,4 +1,5 @@
 import data from '../views/data/clusterOutput(1).json'
+
 export default {
     test: 'origintest',
     snapTime: data.snaps,

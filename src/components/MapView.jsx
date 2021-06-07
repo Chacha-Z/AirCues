@@ -2,32 +2,33 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Switch } from 'antd';
 /* eslint-disable no-undef */
-import Chart from '../views/map-chart';
+import HeatChart from '../views/map-chart';
 import HexChart from '../views/hexbin-chart';
+import ScatterChart from '../views/scatterpoint-chart';
 import * as d3 from 'd3'
 
 import './view-comp-style.less';
 
 class View extends React.PureComponent {
-    map = null;
-
     componentDidMount() {
-        this.map = new AMap.Map(this.container, {
+        var map = new AMap.Map(this.container, {
             zooms: [0, 15],
             zoom: 4,
             center: [102.618687, 37.790976],
             mapStyle: 'amap://styles/dark',
         });
-        Chart.init(this.map, this.props.heatMapData[this.props.snapIndex]);
+        HeatChart.init(map, this.props.heatMapData[this.props.snapIndex]);
         
         d3.csv("./CSVdata/hexCSV.csv").then((data)=>{
-            HexChart.init(this.map, this.container, data, this.props.dispatch);
+            HexChart.init(map, this.container, data, this.props.dispatch);
         })
-    
+        ScatterChart.init(map, this.container)
     }
+
     componentDidUpdate(prevProps, prevState) {
-        Chart.update(this.props.heatMapData[this.props.snapIndex])
+        HeatChart.update(this.props.heatMapData[this.props.snapIndex])
     }
+
     render() {
         return (
             <Card className='view view-map'>

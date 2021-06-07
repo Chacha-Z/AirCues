@@ -4,7 +4,7 @@ import * as d3hexbin from "d3-hexbin";
 class Chart{
     margin = {top: 5, right: 15, bottom: 20, left: 30};
     widt = 500
-    height = 100
+    height = 500
 
     blue_color = null;
 
@@ -13,7 +13,7 @@ class Chart{
 
     init(container, data){
         this.width = container.clientWidth;
-        this.height = container.clientHeight;
+        this.height = 250;
 
         this.blue_color = d3
             .scaleSequential(d3.interpolate("white", "steelblue"))
@@ -21,20 +21,15 @@ class Chart{
 
         this.svg = d3.select(container)
             .append('svg')
+            .attr('id', 'hexbinc-svg')
             .attr('width', this.width)
-            .attr('height', this.height)
-
-        // this.hexitem = this.svg
-        //     .append("g")
-        //     .attr("stroke", "#000")
-        //     .attr("stroke-opacity", 0.1)
-            
+            .attr('height', this.height)            
     }
 
     update(data){
         console.log('update:', data)
         d3.selectAll('path.compare-hexbin').remove();
-        let radius = 100;
+        let radius = this.height/2;
 
         //生成大小六边形
         let large_hex = this.radius_vertex(radius);
@@ -49,7 +44,7 @@ class Chart{
             .append("path")
             .attr('class', 'compare-hexbin')
             .attr("d", this.vertex_path(large_hex))
-            .attr("transform", (d, i) => `translate(${(i+1)*200+10},${100})`)
+            .attr("transform", (d, i) => `translate(${i*radius*2+radius+radius/2},${radius})`)
             .attr("fill", (d) => {
                 return this.blue_color(d.aqi_avg);
             })
@@ -70,7 +65,7 @@ class Chart{
             aqi_color.push(
                 d3
                     .scaleSequential(d3.interpolate("white", e))
-                    .domain([0, d3.max(data, (d) => d.aqi_sum[i])])
+                    .domain([0, 15000])
             );
         });
 
@@ -102,7 +97,7 @@ class Chart{
                     .append("path")
                     .attr('class', 'compare-hexbin')
                     .attr("d", tripath)
-                    .attr("transform", (d, i) => `translate(${(i+1)*200+10},${100})`)
+                    .attr("transform", (d, i) => `translate(${i*radius*2+radius+radius/2},${radius})`)
                     .attr("fill", function (d) {
                         return aqi_color[j](d.aqi_sum[i]);
                     });
