@@ -17,7 +17,6 @@ class Test extends React.PureComponent {
 
     componentDidMount(){
         Chart.init(this.container, this.data);
-        
     }
 
     componentDidUpdate(){
