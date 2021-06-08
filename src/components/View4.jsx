@@ -25,12 +25,9 @@ class Test extends React.PureComponent {
     }
 
     render(){
-        // const { value, onButtonClick } = this.props;
         return (
             <Card className='view view-name4' title="test block4">
             <div className='view-container' ref={ ref=> this.container = ref }>
-                {/* <span>state.test = {value}</span>
-                <button onClick={onButtonClick}>click me </button> */}
             </div>
             </Card>
         )
