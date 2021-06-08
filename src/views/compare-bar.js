@@ -54,7 +54,7 @@ class Chart {
         svg.selectAll("g")
             .data(data)
             .join('g')
-            .attr("fill", "steelblue")
+            .attr("fill", "#4a595b")
             .selectAll("rect")
             .data((d, i) => d.map(item => {
                 return {

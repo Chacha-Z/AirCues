@@ -6,11 +6,11 @@ class Chart{
         width: 500,
         height: 100
     }
-    parseDate = d3.timeParse('%Y-%m-%d');
-    topics = ['1','2','3','4'];
+    parseDate = d3.timeParse('%Y%m%d');
+    topics = ['2','3','4','5','6'];
     ColorMap = d3.scaleOrdinal()
                         .domain(this.topics)
-                        .range(['FDA049','F4AAA4', 'A599FF','A7C8BB'])
+                        .range(['#ffff24', '#fc8705','#dd3700','#732e7e', '#700000'])
     stack = d3.stack().keys(this.topics).offset(d3.stackOffsetWiggle);
     
 
@@ -71,7 +71,8 @@ class Chart{
         .attr('d', this.area)
         .attr('topic', (val,index)=> this.topics[index])
         .attr('click', false)
-        .attr('fill', (d,i) => `#${this.ColorMap(this.topics[i])}`)
+        .attr('fill', (d,i) => `${this.ColorMap(this.topics[i])}`)
+        .attr('opacity','0.8')
         // .attr('opacity',function(){
         //   let topic = d3.select(this).attr('topic')
         //   if(topic==state.check_topic||state.check_topic==0){
