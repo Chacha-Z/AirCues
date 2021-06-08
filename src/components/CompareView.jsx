@@ -7,11 +7,12 @@ import BarChart from '../views/compare-bar';
 class View extends React.PureComponent {
     componentDidMount(){
         HexChart.init(this.container, this.props.choosedHexbin)
-        BarChart.init(this.container)
+        BarChart.init(this.container, this.props.comparePOI)
     }
 
     componentDidUpdate(){
         HexChart.update(this.props.choosedHexbin)
+        BarChart.update(this.props.comparePOI)
     }
 
     render(){
@@ -27,7 +28,8 @@ class View extends React.PureComponent {
 }
 
 const mapStateToProps = (state) => ({
-    choosedHexbin: state.choosedHexbin
+    choosedHexbin: state.choosedHexbin,
+    comparePOI: state.comparePOI
 })
 
 const mapDispatchToProps = (dispath) => ({

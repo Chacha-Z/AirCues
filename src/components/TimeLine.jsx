@@ -1,5 +1,5 @@
 import React from 'react';
-import { nextSnap, saveSnap, getTimeLine } from '../store/actions';
+import { nextSnap, saveSnap } from '../store/actions';
 import { connect } from 'react-redux';
 import { Card, Switch, Radio } from 'antd';
 import Chart from '../views/timeline-chart';
@@ -7,18 +7,13 @@ import MapChart from '../views/map-chart';
 import HexbinChart from '../views/hexbin-chart';
 import ScatterChart from '../views/scatterpoint-chart';
 import * as html2canvas from 'html2canvas';
-import Http from '../store/http';
 
-const http = new Http();
 class View extends React.PureComponent {
 
     clickI = null;
 
     componentDidMount(){
-        const result = http.get('getTimeLine', {
-        });
-        this.props.getTimeLine(result);
-        Chart.init(this.container, this.props.timeLineData, this.props.snaps);
+        Chart.init(this.container, this.props.timeLineData, this.props.snaps, this.props.dispatch);
         
         this.clickI = setInterval(()=>{
             this.snapsPlay();
@@ -33,7 +28,6 @@ class View extends React.PureComponent {
         if(!checked){
             clearInterval(this.clickI)
         }else{
-
             this.clickI = setInterval(()=>{
                 this.snapsPlay();
             }, 2000)
@@ -129,15 +123,14 @@ const mapStateToProps = (state) => ({
     timeLineData: state.timeLineData
 })
 
-const mapDispatchToProps = (dispath) => ({
+const mapDispatchToProps = (dispatch) => ({
     saveSnap: (src) => {
-        dispath(saveSnap(src))
+        dispatch(saveSnap(src))
     },
     nextSnap: () => {
-        dispath(nextSnap())
+        dispatch(nextSnap())
     },
-    getTimeLine: (result) => {
-        dispath(getTimeLine(result))
-    }
+    dispatch
+
 })
 export default connect(mapStateToProps, mapDispatchToProps)(View);

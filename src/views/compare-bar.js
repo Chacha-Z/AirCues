@@ -18,12 +18,7 @@ class Chart {
 
     svg = null;
 
-    init(container) {
-        let data = [
-            [{ type: "居住用地", value: 22 }, { type: "公共管理与公共服务设施用地", value: 32 }, { type: "商业服务业设施用地", value: 14 }, { type: "工业用地", value: 14 }, { type: "道路与交通设施用地", value: 14 }, { type: "绿地与广场用地", value: 14 }],
-            [{ type: "居住用地", value: 50 }, { type: "公共管理与公共服务设施用地", value: 32 }, { type: "商业服务业设施用地", value: 14 }, { type: "工业用地", value: 14 }, { type: "道路与交通设施用地", value: 14 }, { type: "绿地与广场用地", value: 14 }]
-        ]
-
+    init(container, data) {
         this.width = container.clientWidth;
         this.height = container.clientHeight - 250;
         this.margin.middel_left = this.width / 2 + this.margin.left - this.middle_width
@@ -47,13 +42,14 @@ class Chart {
             .call(d3.axisTop(this.x_left).ticks(this.width / 80))
             .call(g => g.select(".domain").remove())
 
-        const svg = d3.select(container).append('svg')
+        this.svg = d3.select(container).append('svg')
             .attr('width', this.width)
             .attr('height', this.height)
 
-        svg.selectAll("g")
+        this.svg.selectAll("g.bars")
             .data(data)
             .join('g')
+            .attr('class', 'bars')
             .attr("fill", "steelblue")
             .selectAll("rect")
             .data((d, i) => d.map(item => {
@@ -68,7 +64,8 @@ class Chart {
             .attr("y", d => this.y(d.type))
             .attr("width", d => d.side == 0 ? this.x_left(0) - this.x_left(d.value) : this.x_right(d.value) - this.x_right(0))
             .attr("height", this.y.bandwidth());
-        svg.selectAll('g.type')
+
+        this.svg.selectAll('g.type')
             .data(this.legend)
             .join('g')
             .attr('transform', d => `translate(${this.margin.middel_left + this.middle_width}, ${this.y(d) + this.y.bandwidth() / 2})`)
@@ -81,14 +78,58 @@ class Chart {
             .attr('dominant-baseline', 'middle')
             .attr('text-anchor', 'middle')
 
-        svg.append("g")
+        this.svg.append("g")
+            .attr('class', 'xaxis')
             .call(this.xAxis_right);
-        svg.append("g")
+        this.svg.append("g")
+            .attr('class', 'xaxis')
             .call(this.xAxis_left);
     }
 
-    update(index) {
+    update(data) {
+        this.x_left
+            .domain([0, d3.max(data, d => d3.max(d, item => item.value))])
+        this.x_right
+            .domain([0, d3.max(data, d => d3.max(d, item => item.value))])
+        d3.selectAll('g.xaxis').remove();
+        this.xAxis_right = g => g
+            .attr("transform", `translate(0,${this.margin.top})`)
+            .call(d3.axisTop(this.x_right).ticks(4))
+            .call(g => g.select(".domain").remove())
 
+        this.xAxis_left = g => g
+            .attr("transform", `translate(0,${this.margin.top})`)
+            .call(d3.axisTop(this.x_left).ticks(4))
+            .call(g => g.select(".domain").remove())
+
+        this.svg.append("g")
+            .attr('class', 'xaxis')
+            .call(this.xAxis_right);
+        this.svg.append("g")
+            .attr('class', 'xaxis')
+            .call(this.xAxis_left);
+
+        if(this.svg.selectAll('g.bars')){
+            this.svg.selectAll('g.bars').remove()
+        }
+        this.svg.selectAll("g.bars")
+            .data(data)
+            .join('g')
+            .attr('class', 'bars')
+            .attr("fill", "steelblue")
+            .selectAll("rect")
+            .data((d, i) => d.map(item => {
+                return {
+                    side: i,
+                    type: item.type,
+                    value: item.value
+                }
+            }))
+            .join("rect")
+            .attr("x", d => d.side == 0 ? this.x_left(d.value) : this.x_right(0))
+            .attr("y", d => this.y(d.type))
+            .attr("width", d => d.side == 0 ? this.x_left(0) - this.x_left(d.value) : this.x_right(d.value) - this.x_right(0))
+            .attr("height", this.y.bandwidth());
     }
 }
 
