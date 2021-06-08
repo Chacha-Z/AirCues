@@ -27,7 +27,6 @@ class Chart{
     }
 
     update(data){
-        console.log('update:', data)
         d3.selectAll('path.compare-hexbin').remove();
         let radius = this.height/2;
 

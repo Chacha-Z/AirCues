@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { timeSpan } from '../store/actions';
 
 class Chart{
     margin = {top: 5, right: 15, bottom: 20, left: 30};
@@ -23,7 +24,7 @@ class Chart{
 
     svg = null;
 
-    init(container, data, snaps){
+    init(container, data, snaps, dispatch){
         data.forEach(element => {
             element.date = this.parseDate(element.date);
         });
@@ -35,8 +36,20 @@ class Chart{
 
         this.brush
             .extent([[this.margin.left, 0], [this.config.width - this.margin.right, this.config.height-this.margin.bottom]])
-            .on('end', ()=>{
-                console.log('brush end')
+            .on('end', (event)=>{
+                let selection = event.selection;
+                if(selection == null){
+                  return ;
+                }
+                let dateRange = selection.map(this.x.invert, this.x);
+                console.log(dateRange)
+
+                let dateFormat =d3.timeFormat("%Y-%m-%d"); 
+
+                let begin = dateFormat(dateRange[0]);
+                let end = dateFormat(dateRange[1]);
+                console.log(begin, end)
+                dispatch(timeSpan([begin, end]))
             })
         this.x.domain(d3.extent(data, d => d.date))
             .range([this.margin.left, this.config.width - this.margin.right])
@@ -44,11 +57,12 @@ class Chart{
             .range([this.config.height - this.margin.bottom, this.margin.top])  
         this.yAxis = g => g
                     .attr("transform", `translate(${this.margin.left},0)`)
-                    .call(d3.axisLeft(this.y).ticks(this.config.height / 80))
+                    .call(d3.axisLeft(this.y).ticks(2))
                     .call(g => g.select(".domain").remove())
         this.xAxis = g => g
                 .attr("transform", `translate(0,${this.config.height - this.margin.bottom})`)
                 .call(d3.axisBottom(this.x).ticks(this.config.width / 80).tickSizeOuter(0))
+                .call(g => g.select(".domain").remove())
 
         this.svg = d3.select(container)
                 .append('svg')
