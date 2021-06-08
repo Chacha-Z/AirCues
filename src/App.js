@@ -3,7 +3,7 @@ import MapView from './components/MapView';
 import TimeLine from './components/TimeLine';
 import SnapShoot from './components/SnapShoot';
 import CompareView from './components/CompareView';
-import View4 from './components/View4';
+import StreamLine from './components/StreamLine';
 
 function App() {
   return (
@@ -14,7 +14,7 @@ function App() {
           <SnapShoot></SnapShoot>
         </div>
         <CompareView></CompareView>
-        <View4></View4>
+        <StreamLine></StreamLine>
     </div>
   );
 }

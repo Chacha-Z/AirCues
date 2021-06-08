@@ -7,7 +7,7 @@ import BarChart from '../views/compare-bar';
 class View extends React.PureComponent {
     componentDidMount(){
         HexChart.init(this.container, this.props.choosedHexbin)
-        BarChart.init(this.container, this.props.comparePOI)
+        BarChart.init(this.container, this.props.comparePOI, this.tooltip)
     }
 
     componentDidUpdate(){
@@ -22,6 +22,7 @@ class View extends React.PureComponent {
             <div className='view-container' ref={ref => this.container = ref} >
 
             </div>
+            <div id='bartooltip' className='tooltip' style={{display: 'none'}} ></div>
             </Card>
         )
     }

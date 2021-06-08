@@ -42,38 +42,20 @@ class Chart {
             .call(d3.axisTop(this.x_left).ticks(this.width / 80))
             .call(g => g.select(".domain").remove())
 
+
         this.svg = d3.select(container).append('svg')
             .attr('width', this.width)
             .attr('height', this.height)
-
-        this.svg.selectAll("g.bars")
-            .data(data)
-            .join('g')
-            .attr('class', 'bars')
-            .attr("fill", "steelblue")
-            .selectAll("rect")
-            .data((d, i) => d.map(item => {
-                return {
-                    side: i,
-                    type: item.type,
-                    value: item.value
-                }
-            }))
-            .join("rect")
-            .attr("x", d => d.side == 0 ? this.x_left(d.value) : this.x_right(0))
-            .attr("y", d => this.y(d.type))
-            .attr("width", d => d.side == 0 ? this.x_left(0) - this.x_left(d.value) : this.x_right(d.value) - this.x_right(0))
-            .attr("height", this.y.bandwidth());
 
         this.svg.selectAll('g.type')
             .data(this.legend)
             .join('g')
             .attr('transform', d => `translate(${this.margin.middel_left + this.middle_width}, ${this.y(d) + this.y.bandwidth() / 2})`)
             .selectAll('text')
-            .data(d => d.length > 7? [d.slice(0, 7), d.slice(7, d.length)]: [d])
+            .data(d => d.length > 7 ? [d.slice(0, 7), d.slice(7, d.length)] : [d])
             .join('text')
             .text(d => d)
-            .attr('dy', (d, i) => i*20)
+            .attr('dy', (d, i) => i * 20)
             .attr('class', 'type')
             .attr('dominant-baseline', 'middle')
             .attr('text-anchor', 'middle')
@@ -109,9 +91,6 @@ class Chart {
             .attr('class', 'xaxis')
             .call(this.xAxis_left);
 
-        if(this.svg.selectAll('g.bars')){
-            this.svg.selectAll('g.bars').remove()
-        }
         this.svg.selectAll("g.bars")
             .data(data)
             .join('g')
@@ -126,10 +105,36 @@ class Chart {
                 }
             }))
             .join("rect")
+            .attr('class', 'POIRect')
             .attr("x", d => d.side == 0 ? this.x_left(d.value) : this.x_right(0))
             .attr("y", d => this.y(d.type))
             .attr("width", d => d.side == 0 ? this.x_left(0) - this.x_left(d.value) : this.x_right(d.value) - this.x_right(0))
-            .attr("height", this.y.bandwidth());
+            .attr("height", this.y.bandwidth())
+            .on('mouseover', function(event, d){
+                console.log(event)
+
+                d3.select(this)
+                    .style('cursor', 'pointer')
+                    .classed('mouseon', true)
+                
+                //鼠标悬浮框
+                d3.select('#bartooltip').transition()
+                        .duration(100)
+                        .style('display', 'block')
+    
+                d3.select('#bartooltip').html(d.type + ': '+d.value)
+                    .style('left', (event.layerX)+'px')
+                    .style('top', (event.layerY+250)+'px')
+    
+            })
+            .on("mouseout", function(d) {	
+                d3.select(this)
+                    .classed('mouseon', false)
+            
+                    d3.select('#bartooltip').transition()		
+                        .duration(200)
+                        .style('display', 'none')
+            })
     }
 }
 
