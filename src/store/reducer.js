@@ -1,5 +1,5 @@
 import defaultState from './state';
-import { TEST_ACTION1, NEXT_SNAP, SAVE_SNAP, CHOOSE_SNAP, CHOOSE_HEXBIN } from './actions';
+import { TEST_ACTION1, NEXT_SNAP, SAVE_SNAP, CHOOSE_SNAP, CHOOSE_HEXBIN, GET_TIMELINE } from './actions';
 
 const reduers = (state = defaultState, action) => {
     switch(action.type){
@@ -31,6 +31,12 @@ const reduers = (state = defaultState, action) => {
             return {
                 ...state,
                 choosedHexbin: state.choosedHexbin.length < 2? [...state.choosedHexbin, action.data] : [...state.choosedHexbin.slice(1, 2), action.data]
+            }
+        }
+        case GET_TIMELINE: {
+            return {
+                ...state,
+                timeLineData: action.data
             }
         }
         default:

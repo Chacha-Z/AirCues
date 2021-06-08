@@ -1,5 +1,5 @@
 import React from 'react';
-import { nextSnap, saveSnap } from '../store/actions';
+import { nextSnap, saveSnap, getTimeLine } from '../store/actions';
 import { connect } from 'react-redux';
 import { Card, Switch, Radio } from 'antd';
 import Chart from '../views/timeline-chart';
@@ -7,24 +7,18 @@ import MapChart from '../views/map-chart';
 import HexbinChart from '../views/hexbin-chart';
 import ScatterChart from '../views/scatterpoint-chart';
 import * as html2canvas from 'html2canvas';
+import Http from '../store/http';
 
+const http = new Http();
 class View extends React.PureComponent {
-
-    data = [{date: '2018-01-01', value: 93.24}
-        ,{date: '2018-01-29', value: 95.35}
-        ,{date: '2018-02-12', value: 98.84}
-        ,{date: '2018-02-29', value: 99.92}
-        ,{date: '2018-03-05', value: 99.8}
-        ,{date: '2018-03-21', value: 99.47}
-        ,{date: '2018-04-02', value: 100.39}
-        ,{date: '2018-04-29', value: 100.4}
-        ,{date: '2018-05-12', value: 100.81}
-        ,{date: '2018-06-25', value: 100.81}];
 
     clickI = null;
 
     componentDidMount(){
-        Chart.init(this.container, this.data, this.props.snaps);
+        const result = http.get('getTimeLine', {
+        });
+        this.props.getTimeLine(result);
+        Chart.init(this.container, this.props.timeLineData, this.props.snaps);
         
         this.clickI = setInterval(()=>{
             this.snapsPlay();
@@ -131,7 +125,8 @@ const mapStateToProps = (state) => ({
     snaps: state.snapTime,
     snapIndex: state.snapIndex,
     heatMapData: state.heatMapData,
-    snapSrc: state.snapSrc
+    snapSrc: state.snapSrc,
+    timeLineData: state.timeLineData
 })
 
 const mapDispatchToProps = (dispath) => ({
@@ -141,5 +136,8 @@ const mapDispatchToProps = (dispath) => ({
     nextSnap: () => {
         dispath(nextSnap())
     },
+    getTimeLine: (result) => {
+        dispath(getTimeLine(result))
+    }
 })
 export default connect(mapStateToProps, mapDispatchToProps)(View);
