@@ -1,13 +1,12 @@
 /* eslint-disable no-undef */
-import * as d3 from 'd3'
+import * as d3 from 'd3';
 
 const Chart = (function () {
     var heatmap = null;
 
     return {
         init: (map, heatData) => {
-            var max = d3.max(heatData, d => d.count);
-
+            console.log(heatData)
             var disCountry = new AMap.DistrictLayer.Country({
                 SOC: 'CHN',
                 zIndex: 10,
@@ -43,10 +42,9 @@ const Chart = (function () {
             });
         },
 
-        update: (heatData) => {
-            var max = d3.max(heatData, d => d.count);
+        update: (heatData, index) => {
             heatmap.setDataSet({
-                data: heatData,
+                data: heatData[index],
                 max: 100
             });
         },

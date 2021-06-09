@@ -164,7 +164,6 @@ class Chart {
                     .then(res => {
                         dispatch(getPOI(res.data.POIData))
                     })
-
             })
         return this.svg;
     }

@@ -1,5 +1,5 @@
 import defaultState from './state';
-import { TEST_ACTION1, NEXT_SNAP, SAVE_SNAP, CHOOSE_SNAP, CHOOSE_HEXBIN, GET_TIMELINE, GET_POI, TIME_SPAN } from './actions';
+import { TEST_ACTION1, NEXT_SNAP, SAVE_SNAP, CHOOSE_SNAP, CHOOSE_HEXBIN, GET_POI, TIME_SPAN, SET_SCATTER, SET_HEATMAP } from './actions';
 
 const reduers = (state = defaultState, action) => {
     switch(action.type){
@@ -45,6 +45,23 @@ const reduers = (state = defaultState, action) => {
             return {
                 ...state,
                 timeSpan: action.data
+            }
+        }
+        case SET_SCATTER: {
+            console.log('in SET_SCATTER:', action.data)
+            return {
+                ...state,
+                scatterData: action.data
+            }
+        }
+        case SET_HEATMAP: {
+            console.log('in SET_HEATMAP:', action)
+            return {
+                ...state,
+                heatMapData: action.heatMapData,
+                snapTime: action.snaps,
+                snapIndex: 0,
+                snapSrc: [],
             }
         }
         default:

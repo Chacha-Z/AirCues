@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
-import { timeSpan } from '../store/actions';
+import { timeSpan, setHeatmap } from '../store/actions';
+import axios from 'axios';
 
 class Chart{
     margin = {top: 5, right: 15, bottom: 20, left: 30};
@@ -8,6 +9,7 @@ class Chart{
         height: 100
     }
     parseDate = d3.timeParse('%Y-%m-%d');
+    parseSnapsDate = d3.timeParse('%Y%m%d');
 
     x = d3.scaleUtc()
     y = d3.scaleLinear()
@@ -24,12 +26,15 @@ class Chart{
 
     svg = null;
 
+    snaps = [];
+
     init(container, data, snaps, dispatch){
+        this.snaps = snaps;
         data.forEach(element => {
             element.date = this.parseDate(element.date);
         });
         snaps = snaps.map(element => {
-            return this.parseDate(element);
+            return this.parseSnapsDate(element);
         });
         this.config.width = container.clientWidth;
         this.config.height = container.clientHeight;
@@ -42,19 +47,24 @@ class Chart{
                   return ;
                 }
                 let dateRange = selection.map(this.x.invert, this.x);
-                console.log(dateRange)
 
-                let dateFormat =d3.timeFormat("%Y-%m-%d"); 
+                let dateFormat = d3.timeFormat("%Y%m%d"); 
 
                 let begin = dateFormat(dateRange[0]);
                 let end = dateFormat(dateRange[1]);
-                console.log(begin, end)
                 dispatch(timeSpan([begin, end]))
+                
+                let host = 'http://180.76.154.189:5000';
+                
+                axios.get(`${host}/${'getClusterCenter/'+begin+'-'+end}`)
+                    .then(res => {
+                        dispatch(setHeatmap(res.data))
+                    })
             })
         this.x.domain(d3.extent(data, d => d.date))
             .range([this.margin.left, this.config.width - this.margin.right])
         this.y.domain([d3.min(data, d => d.value), d3.max(data, d => d.value)]).nice()
-            .range([this.config.height - this.margin.bottom, this.margin.top])  
+            .range([this.config.height - this.margin.bottom, this.margin.top])
         this.yAxis = g => g
                     .attr("transform", `translate(${this.margin.left},0)`)
                     .call(d3.axisLeft(this.y).ticks(2))
@@ -83,7 +93,7 @@ class Chart{
 
         this.svg.append('g')
                 .attr('class', 'timeline-snapticks')
-                .selectAll('rect.snaptick')
+                .selectAll('path.snaptick')
                 .data(snaps)
                 .enter()
                 .append('path')
@@ -101,10 +111,34 @@ class Chart{
                 .call(this.brush);
     }
 
-    update(index){
+    update(index, snaps){
         d3.selectAll('path.snaptick')
-            .attr('fill', (d, i) => i == index?'black': 'none')
+            .attr('fill', (d, i) => i == index?'black': 'none')    
+        if(snaps != this.snaps){
+            this.snaps = snaps;
+            snaps = snaps.map(element => {
+                return this.parseSnapsDate(element);
+            });
+            d3.select('g.timeline-snapticks').remove();
+            this.svg.append('g')
+                .attr('class', 'timeline-snapticks')
+                .selectAll('path.snaptick')
+                .data(snaps)
+                .enter()
+                .append('path')
+                .attr('d', this.symbol)
+                .attr('class', 'snaptick')
+                .attr("transform", d => {
+                  return `translate(${this.x(d)}, ${this.config.height - this.margin.bottom + this.symbolSize/10})`;
+                })
+                .attr('fill', (d, i) => i==0?'black': 'none')
+                .attr('opacity',0.4)
+                .attr('stroke', 'black')
+                .attr('stroke-width', 2)
+        }
+        
     }
+        
 }
 
 export default new Chart();
