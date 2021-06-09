@@ -21,36 +21,47 @@ class Chart {
     hexitem = null;
     largehexitem = null;
     smallhexitem = null;
-    
+
+
     init(map, container, aqidata, dispatch) {
         this.map = map;
         this.aqidata = aqidata;
         this.container = container;
 
-        map.on("complete", ()=>{
-            this.svg = this.drawhexbin(dispatch);
-            // 创建一个自定义图层
-            this.customLayer  = new AMap.CustomLayer(this.svg.node(), {
-                zIndex: 100,
-                zooms: [3, 18] // 设置可见级别，[最小级别，最大级别]
-            });
-    
-            map.add(this.customLayer);
-            this.customLayer.hide();
+        // let host = 'http://180.76.154.189:5000';
+        // let date = '20130102';
+
+        // axois.get(`${host}/${'getDailyAQI' + '/' + date}`)
+        //     .then(res => {
+        //         //console.log(res.data);
+        //         console.log("2" + res.data[date]);
+        //         this.aqidata = res.data[date];
+        //         //HexChart.init(map, this.container, res.data[date], this.props.dispatch);
+        //     })
+
+        this.svg = this.drawhexbin(dispatch);
+        // 创建一个自定义图层
+        console.log(this.svg)
+        this.customLayer = new AMap.CustomLayer(this.svg.node(), {
+            zIndex: 100,
+            zooms: [3, 18] // 设置可见级别，[最小级别，最大级别]
         });
 
-        map.on('moveend', ()=>{
+        map.add(this.customLayer);
+        this.customLayer.hide();
+
+        map.on('moveend', () => {
             this.svg = this.drawhexbin(dispatch);
             d3.select('#hexsvg').remove();
-            if(d3.select('.amap-e').node() != null){
+            if (d3.select('.amap-e').node() != null) {
                 d3.select('.amap-e').node().appendChild(this.svg.node());
             }
         });
-        
-        map.on('zoomend', ()=>{
+
+        map.on('zoomend', () => {
             this.svg = this.drawhexbin(dispatch);
             d3.select('#hexsvg').remove();
-            if(d3.select('.amap-e').node() != null){
+            if (d3.select('.amap-e').node() != null) {
                 d3.select('.amap-e').node().appendChild(this.svg.node());
             }
         })
@@ -58,6 +69,7 @@ class Chart {
 
     // 绘制蜂窝图层
     drawhexbin = (dispatch) => {
+        console.log('in draw')
         this.width = this.container.clientWidth;
         this.height = this.container.clientHeight;
         this.svg = d3 //构建svg画布
@@ -75,23 +87,35 @@ class Chart {
         let large_hex = this.radius_vertex(this.radius);
         let small_hex = this.radius_vertex(this.radius * 0.8);
 
-        let aqi_bins = this.dataProcess(this.aqidata);
+        // let aqi_bins = this.dataProcess(this.aqidata); 
 
+        // let aqi_bins = []
+
+        // for (let i = 0; i < 6; i++) { //绑定数据 6天
+        //     aqi_bins[i] = this.dataProcess(this.aqidata[i]);
+        // }
+
+        let aqi_bins = this.dataProcess(this.aqidata); //包含六天的
+        console.log(aqi_bins)
+
+        console.log('after dataprocess')
         //颜色映射
         let red_color = d3
             .scaleSequential(d3.interpolate("white", "#FF4500"))
-            .domain([0, d3.max(aqi_bins, (d) => d.aqi_avg)]);
+            .domain([0, d3.max(aqi_bins, (d) => d.aqi_avg)]); //红色代表当天
         let blue_color = d3
             .scaleSequential(d3.interpolate("white", "steelblue"))
-            .domain([0, d3.max(aqi_bins, (d) => d.aqi_avg)]);
+            .domain([0, d3.max(aqi_bins, (d) => d.aqi_avg)]); //蓝色也代表当天的
 
         this.hexitem = this.svg
             .append("g")
             .attr("stroke", "#000")
             .attr("stroke-opacity", 0.1)
             .selectAll("path")
-            .data(aqi_bins)
+            .data(aqi_bins) // [0]
             .enter();
+
+
 
         // 外层六边形
         let largehexitem = this.hexitem
@@ -102,6 +126,7 @@ class Chart {
                 return blue_color(d.aqi_avg);
             })
             .attr("opacity", 0.85);
+        console.log('after draw large hex')
         // 内部六边形
         if (this.nowzoom <= 4) {
             this.hexbinlevel1(red_color, small_hex, this.hexitem);
@@ -110,7 +135,7 @@ class Chart {
         } else {
             this.hexbinlevel3(aqi_bins, this.hexitem);
         }
-        // 透明图层，for交互
+        //透明图层，for交互
         let chipath = this.hexitem
             .append("path")
             .attr("d", this.vertex_path(large_hex))
@@ -120,7 +145,7 @@ class Chart {
 
         chipath
             .style('cursor', 'pointer')
-            .on('click', (e)=>{
+            .on('click', (e) => {
 
                 // 根据坐标获取中心点经纬度
                 var pixel = new AMap.Pixel(e.target.__data__.x, e.target.__data__.y);
@@ -132,18 +157,18 @@ class Chart {
 
                 // 保存当前点击六边形原始数据，用于对比视图
                 dispatch(chooseHexbin(e.target.__data__))
-                
+
                 var host = 'http://180.76.154.189:5000';
-                    
-                axois.get(`${host}/${'getPOI'+'/'+lnglat.lng+'/'+lnglat.lat}`)
+
+                axois.get(`${host}/${'getPOI' + '/' + lnglat.lng + '/' + lnglat.lat}`)
                     .then(res => {
                         dispatch(getPOI(res.data.POIData))
-                    })                
+                    })
             })
         return this.svg;
     }
 
-    hexbinlevel1(red_color, small_hex, hexitem){
+    hexbinlevel1(red_color, small_hex, hexitem) {
         //缩放Level 1 （整个六边形）
         hexitem
             .append("path")
@@ -159,7 +184,7 @@ class Chart {
             })
             .attr("opacity", 0.9);
     }
-    hexbinlevel2(red_color, small_hex, hexitem){//缩放Level 2 （六块三角形）
+    hexbinlevel2(red_color, small_hex, hexitem) {//缩放Level 2 （六块三角形）
         let vertex = small_hex;
         for (let i = 0; i < vertex.length; i++) {
             //length是6
@@ -184,12 +209,22 @@ class Chart {
                         })`
                 ) //从原点移过来
                 .attr("fill", function (d) {
-                    return red_color(d.aqi_sum[i]); // 需要一个六个的数组， 画小三角的颜色
+                    return red_color(d.aqi_avg6[i]); // 需要一个六个的数组， 画小三角的颜色
                 })
                 .attr("opacity", 0.85);
         }
     }
-    hexbinlevel3(aqi_bins, hexitem){
+
+    getCol = (arr, i) => {
+        let col = [];
+        let x; // 每一行
+        for (x of arr) {
+            col.push(x[i])
+        }
+        return col;
+    }
+
+    hexbinlevel3(aqi_bins, hexitem) {  // 六层三角形
         //缩放Level 3 三角区分层
         let itemcolor = [
             "MediumPurple",
@@ -202,13 +237,14 @@ class Chart {
 
         let aqi_color = []; //存放6个颜色比例尺
         itemcolor.forEach((e, i) => {
+            //let eachaqi = this.getCol(aqi_bins.aqi_avg6_d6, i)
             aqi_color.push(
                 d3
                     .scaleSequential(d3.interpolate("white", e))
-                    .domain([0, d3.max(aqi_bins, (d) => d.aqi_sum[i])])
+                    // .domain([0, d3.max(aqi_bins, (d) => this.getCol(d.aqi_avg6_d6))]) // 根据最大的确定
+                    .domain([0, d3.max(aqi_bins, (d) => d3.max(this.getCol(d.aqi_avg6_d6, i)))])
             );
         });
-
         // 生成层次hex 的定点
         let aqi_vertex = [];
         let s = 0;
@@ -219,7 +255,7 @@ class Chart {
         // console.log("aqi_vertex:", aqi_vertex);
         for (let i = 5; i >= 0; i--) {
             // 六瓣三角形
-            for (let j = 0; j < 6; j++) {
+            for (let j = 0; j < 6; j++) { //j = 6
                 // 七层
                 let k = (j + 1) % 6; // k不就是i+1吗？ 6的时候不是
                 let tripath =
@@ -236,20 +272,24 @@ class Chart {
                     .append("path")
                     .attr("d", tripath)
                     .attr("transform", (d) => `translate(${d.x},${d.y})`)
+                    //.attr("stroke", "white")
                     .attr("fill", function (d) {
-                        return aqi_color[j](d.aqi_sum[i]);
+                        // console.log(d.aqi_avg6_d6[j][i]);
+                        //console.log(aqi_color[i](d.aqi_avg6_d6[j][i]));
+                        return aqi_color[j](d.aqi_avg6_d6[i][j]); //颜色 改改改
+                        //return aqi_color[j](d.aqi_avg6[i]);
                     });
             }
         }
     }
     data_to_hexbin = (data) => {
         data.forEach((d) => {
-            let lnglat = new AMap.LngLat(d.lng, d.lat); //给定的经纬度创建一个地理坐标
+            let lnglat = new AMap.LngLat(d.lon, d.lat); //给定的经纬度创建一个地理坐标
             let pixl = this.map.lngLatToContainer(lnglat); //返回地图图层上与地理坐标相一致的点
             d.latX = pixl.y;
             d.lngY = pixl.x;
         });
-        // console.log('lnglat data: ', data)
+        // console.log('lnglat data: ', data) 
         let hexbin = d3hexbin
             .hexbin() //六边形构造器
             .x((d) => d.lngY)
@@ -273,7 +313,7 @@ class Chart {
         }
         return vertex;
     }
-    
+
     // 风向偏移函数
     wind_move = (u, v) => {
         let x, y; //偏移量
@@ -308,7 +348,7 @@ class Chart {
         }
         return [x, y];
     }
-    
+
     vertex_path = (arr) => {
         let s = "M";
         arr.forEach((i) => {
@@ -318,49 +358,58 @@ class Chart {
         return s;
     }
 
+
     dataProcess = (aqidata) => {
-        // 绑定真实数据
-        let aqi_bins = this.data_to_hexbin(aqidata);
+        let aqi_avg6_d6 = [[], [], [], [], [], []];
+        let aqi_bins = [];
+        // 绑定一天的真实数据
+        for (let i = 0; i < 6; i++) {
+            aqi_bins.push(this.data_to_hexbin(aqidata[i]));
 
-        // 求AQI， 暂时用均值
-        function avg(array) {
-            let len = array.length;
-            let sum = 0;
-            for (let i = 0; i < len; i++) {
-                sum += array[i];
-            }
-            return sum / len;
-        }
+            //统计六方向数据 （ -> 整体六种值
+            aqi_bins[i].forEach((d) => { //d是六边形中的多个结点
+                //console.log(d);
+                let aqi_sum = new Array(6).fill(0); // [0,0,0,0,0,0]
+                let AQI_SUM = 0;
+                let wind_U = 0, wind_V = 0;
 
-        //统计六方向数据 （ -> 整体六种值
-        aqi_bins.forEach((d) => {
-            //console.log(d);
-            let aqi_sum = new Array(6).fill(0); // [0,0,0,0,0,0]
-            let wind_U, wind_V;
+                // 计算这整个六边形中的各种气体因子浓度和。（之后可能是计算均值/污染级别）
+                d.forEach((i) => {
+                    //console.log(i);
+                    AQI_SUM += i['AQI'];
+                    aqi_sum[0] += i['PM2.5_IAQI'];
+                    aqi_sum[1] += i['PM10_IAQI'];
+                    aqi_sum[2] += i['SO2_IAQI'];
+                    aqi_sum[3] += i['NO2_IAQI'];
+                    aqi_sum[4] += i['CO_IAQI']; // 应该是1000， 效果
+                    aqi_sum[5] += i['O3_IAQI'];
+                    wind_U += i['U'];
+                    wind_V += i['V'];
+                });
 
-            // 计算这整个六边形中的各种气体因子浓度和。（之后可能是计算均值/污染级别）
-            d.forEach((i) => {
-                //console.log(i);
-                aqi_sum[0] += Number(i.PM2_5);
-                aqi_sum[1] += Number(i.PM10);
-                aqi_sum[2] += Number(i.SO2);
-                aqi_sum[3] += Number(i.NO2);
-                aqi_sum[4] += Number(i.CO * 100); // 应该是1000， 效果
-                aqi_sum[5] += Number(i.O3);
-                wind_U += Number(i.U);
-                wind_V += Number(i.V);
+                //console.log(d.length);
+                let aqi_avg6 = aqi_sum.map(item => {
+                    return item / d.length;
+                });
+                d.aqi_avg6 = aqi_avg6;
+                d.aqi_avg = AQI_SUM / d.length; // /d.length
+
+                d.avg_U = wind_U / d.length; //风速求平均
+                d.avg_V = wind_V / d.length;
+
+                aqi_avg6_d6[i].push(aqi_avg6); //存后六天的数据
             });
-            //console.log(d.length);
-            d.aqi_sum = aqi_sum;
-            d.aqi_avg = avg(aqi_sum); // /d.length
-
-            d.avg_U = wind_U / d.length; //风速求平均
-            d.avg_V = wind_V / d.length;
-        });
-
-        return aqi_bins
+            //console.log(aqidata)
+        }
+        for (let i = 0; i < aqi_avg6_d6[0].length; ++i) {
+            aqi_bins[0][i].aqi_avg6_d6 = []
+            for (let j = 0; j < 6; ++j) {
+                aqi_bins[0][i].aqi_avg6_d6.push(aqi_avg6_d6[j][i]);
+            }
+        }
+        return aqi_bins[0] // 可以只返回第一天的，已经有后六天的数据了
     }
-    
+
     hexagonSwitchChange(checked) {
         if (checked) {
             this.customLayer.show();
