@@ -1,5 +1,6 @@
 import data from '../views/data/clusterOutput(1).json'
 import timeline from '../views/data/getTimeLine.json'
+import stream from '../views/data/getBinData.json'
 
 export default {
     test: 'origintest',
@@ -10,5 +11,6 @@ export default {
     choosedHexbin: [],
     timeLineData: timeline.timelineData,
     comparePOI: [],
-    timeSpan:[]
+    timeSpan:[],
+    stream:stream.binData
 }

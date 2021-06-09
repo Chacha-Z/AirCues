@@ -3,29 +3,41 @@ import { testAction1 } from '../store/actions';
 import { connect } from 'react-redux';
 import { Card } from 'antd';
 import Chart from '../views/stream-chart';
+import axios from 'axios'
+import * as d3 from 'd3'
+
 
 class Test extends React.PureComponent {
 
-    data = [{date: '2018-01-01', '1': 93.24,'2':54,"3":67,"4":100},
-            {date: '2018-01-02', '1': 12,'2':54,"3":67,"4":10},
-            {date: '2018-01-03', '1': 93.24,'2':54,"3":67,"4":10},
-            {date: '2018-01-04', '1': 45,'2':54,"3":67,"4":10},
-            {date: '2018-01-05', '1': 93.24,'2':54,"3":67,"4":10},
-            {date: '2018-01-06', '1': 123,'2':54,"3":67,"4":10},
-            {date: '2018-01-07', '1': 66,'2':54,"3":67,"4":10}
-    ];
+    data = [];
+    parseDate = d3.timeFormat('%Y-%m-%d');
 
     componentDidMount(){
-        Chart.init(this.container, this.data);
+        // axios.get("http://180.76.154.189:5000/getBinData")
+        //         .then(res=>{
+        //     this.data = res.data.binData
+        //     console.log(this.data)
+        //     Chart.init(this.container, this.data);
+        // })
+        console.log(this.props.stream)
+        Chart.init(this.container, this.props.stream);  
+
     }
 
     componentDidUpdate(){
-        Chart.update(this.data)
+        // console.log(this.props.stream)
+        let start =  this.props.stream.findIndex(element => this.parseDate(element["date"]) === this.props.timeSpan[0])
+        let end = this.props.stream.findIndex(element => this.parseDate(element["date"]) === this.props.timeSpan[1])
+        // let newdata = this.props.stream.slice(start, end);
+        // console.log(this.newdata)
+        // console.log(start,end)
+        console.log(this.props.stream.slice(start,end))
+        Chart.update(this.container, this.props.stream.slice(start,end))
     }
 
     render(){
         return (
-            <Card className='view view-name4' title="test block4">
+            <Card className='view view-name4' title="stream view">
             <div className='view-container' ref={ ref=> this.container = ref }>
             </div>
             </Card>
@@ -34,7 +46,8 @@ class Test extends React.PureComponent {
 }
 
 const mapStateToProps = (state) => ({
-    value: state.test,
+    timeSpan: state.timeSpan,
+    stream:state.stream
 })
 
 const mapDispatchToProps = (dispath) => ({
