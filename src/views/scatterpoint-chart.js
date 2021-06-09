@@ -50,6 +50,7 @@ class Chart {
         this.maxCluster = data.maxId;
         this.colorScale
             .domain([0,this.maxCluster]) 
+            
         this.onRender();
     }
 
@@ -68,7 +69,8 @@ class Chart {
                     .attr('fill', d=>this.colorScale(d.cluster)),
                 update => update
                     .attr('cx', d=>d.lngY)
-                    .attr('cy', d=>d.latX),
+                    .attr('cy', d=>d.latX)
+                    .attr('fill', d=>this.colorScale(d.cluster)),
                 exit => exit.remove()
             )
     }

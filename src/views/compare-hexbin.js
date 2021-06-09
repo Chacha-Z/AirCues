@@ -17,7 +17,6 @@ class Chart{
 
         this.blue_color = d3
             .scaleSequential(d3.interpolate("white", "steelblue"))
-            .domain([0, 5000]);
 
         this.svg = d3.select(container)
             .append('svg')
@@ -30,10 +29,10 @@ class Chart{
     update(data){
         d3.selectAll('path.compare-hexbin').remove();
         let radius = this.height/2;
-
+        this.blue_color
+            .domain([0, d3.max(data, (d) => d.aqi_avg)]);
         //生成大小六边形
         let large_hex = this.radius_vertex(radius);
-        let small_hex = this.radius_vertex(radius * 0.8);
         
         let update = this.svg
             .selectAll("path")
@@ -65,7 +64,7 @@ class Chart{
             aqi_color.push(
                 d3
                     .scaleSequential(d3.interpolate("white", e))
-                    .domain([0, 15000])
+                    .domain([0, d3.max(data, (d) => d3.max(this.getCol(d.aqi_avg6_d6, i)))])
             );
         });
 
@@ -99,12 +98,20 @@ class Chart{
                     .attr("d", tripath)
                     .attr("transform", (d, i) => `translate(${i*radius*2+radius+radius/2},${radius})`)
                     .attr("fill", function (d) {
-                        return aqi_color[j](d.aqi_sum[i]);
+                        return aqi_color[j](d.aqi_avg6_d6[i][j]); //颜色 改改改
                     });
             }
         }
     }
 
+    getCol = (arr, i) => {
+        let col = [];
+        let x; // 每一行
+        for (x of arr) {
+            col.push(x[i])
+        }
+        return col;
+    }
     vertex_path = (arr) => {
         let s = "M";
         arr.forEach((i) => {
