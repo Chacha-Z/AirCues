@@ -1,5 +1,6 @@
 import data from '../views/data/initHeatmapData.json'
 import timeline from '../views/data/getTimeLine.json'
+import stream from '../views/data/getBinData.json'
 
 export default {
     test: 'origintest',
@@ -11,5 +12,6 @@ export default {
     timeLineData: timeline.timelineData,
     comparePOI: [],
     timeSpan:[],
-    scatterData: {'maxId':5057, "data":[{"cluster":2063,"lnglat":[109.25,18.34]}]}
+    scatterData: {'maxId':5057, "data":[{"cluster":2063,"lnglat":[109.25,18.34]}]},
+    stream:stream.binData
 }
