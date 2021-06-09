@@ -5,7 +5,7 @@ export default class Http {
 
     get(uri, query, options) {
         console.log(uri, query)
-        return axois.get(`${this.host}/${uri}`, { params: query })
+        axois.get(`${this.host}/${uri}`, { params: query })
         .then(res => {
             return res.data;
         })

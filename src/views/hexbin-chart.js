@@ -1,7 +1,8 @@
 import * as d3 from 'd3';
 import * as d3hexbin from "d3-hexbin";
-import { chooseHexbin } from '../store/actions';
+import { chooseHexbin, getPOI } from '../store/actions';
 
+import axois from 'axios';
 /* eslint-disable no-undef */
 class Chart {
     aqidata = [];
@@ -124,13 +125,21 @@ class Chart {
                 // 根据坐标获取中心点经纬度
                 var pixel = new AMap.Pixel(e.target.__data__.x, e.target.__data__.y);
                 var lnglat = this.map.containerToLngLat(pixel);
-
+                console.log(lnglat)
                 d3.select(e.target)
                     .attr("opacity", 0.5)
                     .classed('hexbin-clicked', true)
 
                 // 保存当前点击六边形原始数据，用于对比视图
                 dispatch(chooseHexbin(e.target.__data__))
+                
+                var host = 'http://180.76.154.189:5000';
+                    
+                axois.get(`${host}/${'getPOI'+'/'+lnglat.lng+'/'+lnglat.lat}`)
+                    .then(res => {
+                        dispatch(getPOI(res.data.POIData))
+                    })
+                
             })
         return this.svg;
     }
