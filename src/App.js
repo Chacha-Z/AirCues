@@ -6,6 +6,7 @@ import CompareView from './components/CompareView';
 import StreamLine from './components/StreamLine';
 
 function App() {
+  
   return (
     <div className="App">
         <div className='view-main'>

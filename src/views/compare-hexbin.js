@@ -23,7 +23,8 @@ class Chart{
             .append('svg')
             .attr('id', 'hexbinc-svg')
             .attr('width', this.width)
-            .attr('height', this.height)            
+            .attr('height', this.height)    
+                
     }
 
     update(data){

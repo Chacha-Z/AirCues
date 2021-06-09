@@ -16,13 +16,21 @@ class View extends React.PureComponent {
     }
 
     render(){
-        const { value, onButtonClick } = this.props;
         return (
             <Card className='view view-compare' title="CompareView">
-            <div className='view-container' ref={ref => this.container = ref} >
-
-            </div>
-            <div id='bartooltip' className='tooltip' style={{display: 'none'}} ></div>
+                <div className='view-container' ref={ref => this.container = ref} >
+                    {
+                        this.props.choosedHexbin.length ?
+                        (
+                            <></>
+                        ):
+                        (<div className="place-holder"><div className="place-holder-picture"></div><span> Choose two hexagons <br/>
+                        to compare the POIS  <br/>
+                        in each hexagon  
+                        </span></div>)
+                    }
+                </div>
+                <div id='bartooltip' className='tooltip' style={{display: 'none'}} ></div>
             </Card>
         )
     }

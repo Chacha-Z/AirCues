@@ -2,22 +2,22 @@ import * as d3 from 'd3';
 
 /* eslint-disable no-undef */
 class Chart {
-    data = [
-        {"lnglat":[116.486409,39.561489],"cluster":"1"},
-        {"lnglat":[116.286968,39.863642],"cluster":"1"},
-        {"lnglat":[116.195445,39.914601],"cluster":"2"},
-        {"lnglat":[116.310316,39.956074],"cluster":"2"},
-        {"lnglat":[116.105381,39.937183],"cluster":"0"},
-        // ...
-    ];
+    data = [];
 
     color = ['red', 'blue', 'yellow']
     container = null;
     map = null;
     svg = null;
     customLayer = null;
+    //颜色插值器 
+    colorScale = d3.scaleLinear() 
+                .domain([0,3000]) 
+                .range(["blue","yellow"]) 
 
-    init(map, container) {
+    init(map, container, data) {
+        
+        this.data = data.data;
+        this.maxCluster = data.maxId;
         this.map = map;
         this.container = container;
         var width = this.container.clientWidth;
@@ -43,8 +43,12 @@ class Chart {
         });
 
     }
+    update(data){
+        this.data = data.data;
+        this.onRender();
+    }
 
-    onRender() {        
+    onRender() {
         this.dataProcess(this.data);
 
         this.svg
@@ -55,8 +59,8 @@ class Chart {
                     .append('circle')
                     .attr('cx', d=>d.lngY)
                     .attr('cy', d=>d.latX)
-                    .attr('r', 10)
-                    .attr('fill', d=>this.color[d.cluster]),
+                    .attr('r', 1)
+                    .attr('fill', d=>this.colorScale(d.cluster)),
                 update => update
                     .attr('cx', d=>d.lngY)
                     .attr('cy', d=>d.latX),
