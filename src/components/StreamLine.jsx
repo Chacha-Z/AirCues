@@ -25,7 +25,7 @@ class Test extends React.PureComponent {
 
     render(){
         return (
-            <Card className='view view-name4' title="test block4">
+            <Card className='view view-name4' title="AQI-State StreamLine">
             <div className='view-container' ref={ ref=> this.container = ref }>
             </div>
             </Card>

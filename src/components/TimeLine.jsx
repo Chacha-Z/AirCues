@@ -21,7 +21,7 @@ class View extends React.PureComponent {
     }
 
     componentDidUpdate(){
-        Chart.update(this.props.snapIndex)
+        Chart.update(this.props.snapIndex, this.props.snaps)
     }
 
     animSwitchChange(checked){
@@ -91,12 +91,12 @@ class View extends React.PureComponent {
 
     render(){
         return (
-            <Card className='view view-timeline' title="test block" extra={
+            <Card className='view view-timeline' title="Main View" extra={
                 <div>
                     <span className="func-span">Layer: </span>
                     <Radio.Group onChange={this.onLayerChange.bind(this)} defaultValue="heatmap" size="small">
                         <Radio.Button value="heatmap" >Heatmap</Radio.Button>
-                        <Radio.Button value="hexbin" >Hexbin</Radio.Button>
+                        <Radio.Button value="hexbin" >Hexagon</Radio.Button>
                         <Radio.Button value="scatter" >Scatter</Radio.Button>
                     </Radio.Group>
                     <Switch className='ctrlBut' ref={ ref=> this.playBut = ref }

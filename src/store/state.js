@@ -1,4 +1,4 @@
-import data from '../views/data/clusterOutput(1).json'
+import data from '../views/data/initHeatmapData.json'
 import timeline from '../views/data/getTimeLine.json'
 
 export default {
@@ -10,5 +10,6 @@ export default {
     choosedHexbin: [],
     timeLineData: timeline.timelineData,
     comparePOI: [],
-    timeSpan:[]
+    timeSpan:[],
+    scatterData: {'maxId':5057, "data":[{"cluster":2063,"lnglat":[109.25,18.34]}]}
 }

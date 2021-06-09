@@ -22,11 +22,12 @@ class View extends React.PureComponent {
         d3.csv("./CSVdata/hexCSV.csv").then((data)=>{
             HexChart.init(map, this.container, data, this.props.dispatch);
         })
-        ScatterChart.init(map, this.container)
+        ScatterChart.init(map, this.container, this.props.scatterData)
     }
 
     componentDidUpdate(prevProps, prevState) {
-        HeatChart.update(this.props.heatMapData[this.props.snapIndex])
+        HeatChart.update(this.props.heatMapData, this.props.snapIndex)
+        ScatterChart.update(this.props.scatterData)
     }
 
     render() {
@@ -43,7 +44,8 @@ class View extends React.PureComponent {
 const mapStateToProps = (state) => ({
     heatMapData: state.heatMapData,
     snapIndex: state.snapIndex,
-    snapSrc: state.snapSrc
+    snapSrc: state.snapSrc,
+    scatterData: state.scatterData
 })
 
 const mapDispatchToProps = (dispatch) => ({

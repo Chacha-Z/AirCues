@@ -138,8 +138,7 @@ class Chart {
                 axois.get(`${host}/${'getPOI'+'/'+lnglat.lng+'/'+lnglat.lat}`)
                     .then(res => {
                         dispatch(getPOI(res.data.POIData))
-                    })
-                
+                    })                
             })
         return this.svg;
     }
