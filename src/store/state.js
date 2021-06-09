@@ -13,5 +13,5 @@ export default {
     comparePOI: [],
     timeSpan:[],
     scatterData: {'maxId':5057, "data":[{"cluster":2063,"lnglat":[109.25,18.34]}]},
-    stream:stream.binData
+    stream: stream.binData
 }
