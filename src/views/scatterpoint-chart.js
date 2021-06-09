@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 /* eslint-disable no-undef */
 class Chart {
     data = [];
-
+    maxCluster = 0;
     color = ['red', 'blue', 'yellow']
     container = null;
     map = null;
@@ -11,7 +11,6 @@ class Chart {
     customLayer = null;
     //颜色插值器 
     colorScale = d3.scaleLinear() 
-                .domain([0,3000]) 
                 .range(["blue","yellow"]) 
 
     init(map, container, data) {
@@ -22,6 +21,9 @@ class Chart {
         this.container = container;
         var width = this.container.clientWidth;
         var height = this.container.clientHeight;
+
+        this.colorScale
+            .domain([0,this.maxCluster]) 
 
         // 创建一个自定义图层
         this.svg = d3
@@ -45,6 +47,9 @@ class Chart {
     }
     update(data){
         this.data = data.data;
+        this.maxCluster = data.maxId;
+        this.colorScale
+            .domain([0,this.maxCluster]) 
         this.onRender();
     }
 

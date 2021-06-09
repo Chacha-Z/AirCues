@@ -10,7 +10,7 @@ import * as d3 from 'd3'
 class Test extends React.PureComponent {
 
     data = [];
-    parseDate = d3.timeFormat('%Y-%m-%d');
+    parseDate = d3.timeFormat('%Y%m%d');
 
     componentDidMount(){
         // axios.get("http://180.76.154.189:5000/getBinData")
