@@ -151,6 +151,7 @@ class Chart {
                 var pixel = new AMap.Pixel(e.target.__data__.x, e.target.__data__.y);
                 var lnglat = this.map.containerToLngLat(pixel);
                 console.log(lnglat)
+                console.log(e.target.__data__);
                 d3.select(e.target)
                     .attr("opacity", 0.5)
                     .classed('hexbin-clicked', true)
@@ -242,7 +243,8 @@ class Chart {
                 d3
                     .scaleSequential(d3.interpolate("white", e))
                     // .domain([0, d3.max(aqi_bins, (d) => this.getCol(d.aqi_avg6_d6))]) // 根据最大的确定
-                    .domain([0, d3.max(aqi_bins, (d) => d3.max(this.getCol(d.aqi_avg6_d6, i)))])
+                    .domain([0, d3.max(aqi_bins, (d) => d.aqi_avg)])
+                //  d3.max(this.getCol(d.aqi_avg6_d6, i)))
             );
         });
         // 生成层次hex 的定点
@@ -271,6 +273,7 @@ class Chart {
                 hexitem
                     .append("path")
                     .attr("d", tripath)
+                    .attr('id', j)
                     .attr("transform", (d) => `translate(${d.x},${d.y})`)
                     //.attr("stroke", "white")
                     .attr("fill", function (d) {
