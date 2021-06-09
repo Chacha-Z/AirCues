@@ -21,6 +21,7 @@ class Test extends React.PureComponent {
         // })
         console.log(this.props.stream)
         Chart.init(this.container, this.props.stream);  
+
     }
 
     componentDidUpdate(){
