@@ -50,7 +50,8 @@ class View extends React.PureComponent {
         // }
 
 
-        d3.json('./data/20130101_6.json').then((data) => {
+        // d3.json('./data/20130101_6.json').then((data) => {
+        d3.json('./data/20140424.json').then((data) => {
             HexChart.init(map, this.container, data, this.props.dispatch);
             console.log(data)
         })

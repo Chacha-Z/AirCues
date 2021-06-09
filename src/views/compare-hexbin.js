@@ -1,8 +1,8 @@
 import * as d3 from 'd3';
 import * as d3hexbin from "d3-hexbin";
 
-class Chart{
-    margin = {top: 5, right: 15, bottom: 20, left: 30};
+class Chart {
+    margin = { top: 5, right: 15, bottom: 20, left: 30 };
     widt = 500
     height = 500
 
@@ -11,7 +11,7 @@ class Chart{
     svg = null;
     hexitem = null;
 
-    init(container, data){
+    init(container, data) {
         this.width = container.clientWidth;
         this.height = 250;
 
@@ -22,18 +22,18 @@ class Chart{
             .append('svg')
             .attr('id', 'hexbinc-svg')
             .attr('width', this.width)
-            .attr('height', this.height)    
-                
+            .attr('height', this.height)
+
     }
 
-    update(data){
+    update(data) {
         d3.selectAll('path.compare-hexbin').remove();
-        let radius = this.height/2;
+        let radius = this.height / 2;
         this.blue_color
-            .domain([0, d3.max(data, (d) => d.aqi_avg)]);
+            .domain([0, 200]); // d3.max(data, (d) => d.aqi_avg)
         //生成大小六边形
         let large_hex = this.radius_vertex(radius);
-        
+
         let update = this.svg
             .selectAll("path")
             .data(data)
@@ -43,7 +43,7 @@ class Chart{
             .append("path")
             .attr('class', 'compare-hexbin')
             .attr("d", this.vertex_path(large_hex))
-            .attr("transform", (d, i) => `translate(${i*radius*2+radius+radius/2},${radius})`)
+            .attr("transform", (d, i) => `translate(${i * radius * 2 + radius + radius / 2},${radius})`)
             .attr("fill", (d) => {
                 return this.blue_color(d.aqi_avg);
             })
@@ -64,7 +64,8 @@ class Chart{
             aqi_color.push(
                 d3
                     .scaleSequential(d3.interpolate("white", e))
-                    .domain([0, d3.max(data, (d) => d3.max(this.getCol(d.aqi_avg6_d6, i)))])
+                    .domain([0, 200])
+                // .domain([0, d3.max(data, (d) => d3.max(this.getCol(d.aqi_avg6_d6, i)))])
             );
         });
 
@@ -96,7 +97,7 @@ class Chart{
                     .append("path")
                     .attr('class', 'compare-hexbin')
                     .attr("d", tripath)
-                    .attr("transform", (d, i) => `translate(${i*radius*2+radius+radius/2},${radius})`)
+                    .attr("transform", (d, i) => `translate(${i * radius * 2 + radius + radius / 2},${radius})`)
                     .attr("fill", function (d) {
                         return aqi_color[j](d.aqi_avg6_d6[i][j]); //颜色 改改改
                     });
